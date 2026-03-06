@@ -20,26 +20,19 @@ router.get('/profile', (req, res) => {
     // Create session record in DB
     db.createSession(session);
 
-    // Build the mobileconfig plist
+    // ✅ CORRECT: "Profile Service" is the ONLY PayloadType Apple allows
+    // for UDID collection. PayloadContent MUST be a dict (not an array).
     const profileData = {
-        PayloadContent: [
-            {
-                PayloadType: 'com.apple.managed-client.preferences',
-                PayloadUUID: uuidv4(),
-                PayloadIdentifier: `com.tophim.udid.${session}`,
-                PayloadOrganization: 'TuPhim',
-                PayloadDisplayName: 'TuPhim Device Registration',
-                PayloadDescription: 'Đăng ký thiết bị để cài TuPhim',
-                PayloadVersion: 1,
-                URL: `${domain}/api/udid/callback?session=${session}`,
-                DeviceAttributes: ['UDID', 'VERSION', 'PRODUCT']
-            }
-        ],
+        PayloadContent: {
+            URL: `${domain}/api/udid/callback?session=${session}`,
+            DeviceAttributes: ['UDID', 'VERSION', 'PRODUCT', 'SERIAL']
+        },
         PayloadDisplayName: 'TuPhim - Đăng ký thiết bị',
+        PayloadDescription: 'Đăng ký thiết bị để cài TuPhim',
         PayloadIdentifier: `com.tophim.profile.${session}`,
         PayloadOrganization: 'TuPhim',
         PayloadRemovalDisallowed: false,
-        PayloadType: 'Configuration',
+        PayloadType: 'Profile Service',
         PayloadUUID: uuidv4(),
         PayloadVersion: 1
     };
@@ -61,37 +54,51 @@ router.get('/profile', (req, res) => {
 // ============================================================
 router.post('/callback', async (req, res) => {
     try {
-        // iOS sends a plist as the raw body (application/x-www-form-urlencoded)
-        let rawBody = '';
-        req.on('data', chunk => { rawBody += chunk.toString(); });
+        let rawBody = Buffer.alloc(0);
+        req.on('data', chunk => { rawBody = Buffer.concat([rawBody, chunk]); });
         req.on('end', async () => {
-            // Decode URL-encoded plist
-            const decoded = decodeURIComponent(rawBody.replace(/^UDID=|^[^=]+=/, ''));
-            let deviceInfo = {};
-            try {
-                deviceInfo = plist.parse(decoded);
-            } catch (e) {
-                // Try parsing the full raw body if not plist
-                deviceInfo = { UDID: rawBody.match(/[0-9a-f]{8}-[0-9a-f]{16}/i)?.[0] || 'unknown' };
+            const bodyStr = rawBody.toString('utf8');
+            console.log('[UDID CALLBACK] Raw body (first 300):', bodyStr.substring(0, 300));
+
+            let udid = 'unknown';
+            let version = 'unknown';
+            let product = 'iPhone';
+
+            // iOS with Profile Service POSTs URL-encoded body containing plist
+            // Try multiple parsing strategies
+            let plistStr = bodyStr;
+
+            // Strategy 1: Direct XML plist in body
+            if (!plistStr.includes('<?xml') && plistStr.includes('%3C')) {
+                try { plistStr = decodeURIComponent(bodyStr); } catch (e) { }
+            }
+            // Strategy 2: key=plist_value format
+            if (plistStr.includes('=') && !plistStr.trimStart().startsWith('<')) {
+                const eqIdx = plistStr.indexOf('=');
+                let val = plistStr.substring(eqIdx + 1);
+                try { val = decodeURIComponent(val); } catch (e) { }
+                if (val.includes('<?xml') || val.includes('<plist')) plistStr = val;
             }
 
-            const udid = deviceInfo.UDID || deviceInfo.DeviceUDID || 'unknown';
-            const version = deviceInfo.VERSION || 'unknown';
-            const product = deviceInfo.PRODUCT || 'iPhone';
+            try {
+                const parsed = plist.parse(plistStr);
+                udid = parsed.UDID || parsed.DeviceUDID || udid;
+                version = parsed.VERSION || parsed.OSVersion || version;
+                product = parsed.PRODUCT || parsed.ProductType || product;
+            } catch (e) {
+                // Last resort: regex for UDID pattern
+                const m = bodyStr.match(/[0-9a-fA-F]{8}-[0-9a-fA-F]{16}|[0-9a-fA-F]{40}/);
+                if (m) udid = m[0];
+                console.error('[UDID PARSE FALLBACK]', e.message);
+            }
+
             const session = req.query.session || 'unknown';
+            console.log(`[UDID] ✅ UDID=${udid} Product=${product} iOS=${version} Session=${session}`);
 
-            console.log(`[UDID] Received: ${udid} | Product: ${product} | iOS: ${version} | Session: ${session}`);
-
-            // Save to DB
-            const device = db.addDevice({ udid, version, product, session, status: 'pending' });
-
-            // Update session status
+            db.addDevice({ udid, version, product, session, status: 'pending' });
             db.updateSession(session, { status: 'udid_received', udid });
-
-            // Auto-sign IPA for this device
             triggerAutoSign(session, udid).catch(e => console.error('[SIGN ERROR]', e.message));
 
-            // Respond with a nice HTML page (required by Apple)
             res.set('Content-Type', 'text/html');
             res.send(`<!DOCTYPE html>
 <html lang="vi">
@@ -113,8 +120,8 @@ router.post('/callback', async (req, res) => {
   <div class="card">
     <div class="icon">✅</div>
     <h2>Thiết bị đã đăng ký!</h2>
-    <p>Chúng tôi đang ký IPA riêng cho thiết bị của bạn. Quá trình này mất khoảng 30-60 giây.</p>
-    <a href="${process.env.APP_DOMAIN}?session=${session}#install-status" class="btn">Quay lại để cài đặt →</a>
+    <p>Đang ký app riêng cho bạn. Quay lại trang web sau 30-60 giây để cài.</p>
+    <a href="${process.env.APP_DOMAIN}?session=${session}" class="btn">Quay lại để cài đặt →</a>
   </div>
 </body>
 </html>`);
