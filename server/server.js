@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 3001;
 // MIDDLEWARE
 // ============================================================
 app.use(cors({
-    origin: [process.env.APP_DOMAIN, 'http://localhost:8765', 'http://localhost:3000'],
+    origin: true, // Allow all origins — security handled by JWT tokens
     credentials: true
 }));
 app.use(express.json());
