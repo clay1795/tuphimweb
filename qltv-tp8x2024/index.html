@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel — TuPhim Distribution</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="stylesheet" href="../admin/admin.css" />
+    <link rel="icon" href="../assets/logo.png" />
+    <style>
+        /* Auth guard overlay */
+        #auth-guard {
+            position: fixed;
+            inset: 0;
+            background: #060818;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #auth-guard .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #4f8ef7;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Real logo in sidebar */
+        .sidebar-logo img {
+            height: 32px;
+            width: auto;
+            object-fit: contain;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Auth guard (hides page until token is verified) -->
+    <div id="auth-guard">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-logo">
+            <img src="../assets/logo.png" alt="TuPhim" />
+            <span style="margin-left:8px">Admin</span>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Tổng quan</div>
+            <div class="sidebar-item active" onclick="showPanel('dashboard', this)">
+                <span class="icon">📊</span> Dashboard
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Quản lý</div>
+            <div class="sidebar-item" onclick="showPanel('devices', this)">
+                <span class="icon">📱</span> Thiết bị (UDID)
+                <span class="sidebar-badge" id="badge-pending">0</span>
+            </div>
+            <div class="sidebar-item" onclick="showPanel('certs', this)">
+                <span class="icon">🔐</span> Chứng chỉ
+            </div>
+            <div class="sidebar-item" onclick="showPanel('releases', this)">
+                <span class="icon">📦</span> Releases
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Phân tích</div>
+            <div class="sidebar-item" onclick="showPanel('analytics', this)">
+                <span class="icon">📈</span> Analytics
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Hệ thống</div>
+            <div class="sidebar-item" onclick="showPanel('settings', this)">
+                <span class="icon">⚙️</span> Cài đặt
+            </div>
+            <a href="../" class="sidebar-item">
+                <span class="icon">🌐</span> Trang chính
+            </a>
+            <div class="sidebar-item" onclick="logout()" style="color:var(--accent-red)">
+                <span class="icon">🚪</span> Đăng xuất
+            </div>
+        </div>
+
+        <div class="sidebar-footer">
+            TuPhim v2.1.0<br />
+            <span style="color:var(--accent-green)">● Hệ thống hoạt động</span>
+        </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="admin-main">
+        <div class="admin-topbar">
+            <div class="topbar-title" id="topbar-title">📊 Dashboard</div>
+            <div class="topbar-actions">
+                <span style="font-size:13px;color:var(--text-muted)" id="admin-username-display"></span>
+                <button class="btn btn-primary" style="font-size:13px" onclick="loadDashboard()">
+                    🔄 Làm mới
+                </button>
+            </div>
+        </div>
+
+        <div class="admin-content">
+
+            <!-- ==================== PANEL: DASHBOARD ==================== -->
+            <div class="panel active" id="panel-dashboard">
+                <div class="notif warning" style="margin-bottom:20px" id="pending-warning">
+                    <div class="notif-icon">⚠️</div>
+                    <div class="notif-content">
+                        <div class="notif-title" id="pending-text">Đang tải dữ liệu…</div>
+                        <div class="notif-body">Quản lý UDID và ký IPA cho thiết bị mới.</div>
+                    </div>
+                    <button class="btn btn-sm btn-outline" style="margin-left:auto;flex-shrink:0"
+                        onclick="showPanel('devices',document.querySelectorAll('.sidebar-item')[1])">Xem</button>
+                </div>
+
+                <div class="stat-cards">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">📲</div><span class="stat-card-trend trend-up">Live</span>
+                        </div>
+                        <div class="stat-card-value" id="stat-installs">—</div>
+                        <div class="stat-card-label">Tổng lượt cài đặt</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">📱</div><span class="stat-card-trend trend-neutral"
+                                id="stat-pending-badge">—</span>
+                        </div>
+                        <div class="stat-card-value" id="stat-devices">—</div>
+                        <div class="stat-card-label">Thiết bị đã đăng ký</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">🔐</div><span class="stat-card-trend trend-neutral">Chứng
+                                chỉ</span>
+                        </div>
+                        <div class="stat-card-value" id="stat-certs">2/3</div>
+                        <div class="stat-card-label">Chứng chỉ hoạt động</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">📦</div><span class="stat-card-trend trend-up">Mới nhất</span>
+                        </div>
+                        <div class="stat-card-value" id="stat-version">v2.1.0</div>
+                        <div class="stat-card-label">Phiên bản hiện tại</div>
+                    </div>
+                </div>
+
+                <!-- Recent sessions -->
+                <div class="admin-table-wrap">
+                    <div class="table-header">
+                        <div class="table-title">📋 Sessions gần đây (50 mới nhất)</div>
+                        <button class="btn btn-sm btn-outline" onclick="loadSessions()">🔄 Tải lại</button>
+                    </div>
+                    <div id="sessions-table-body">
+                        <div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px">Đang tải…
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PANEL: DEVICES ==================== -->
+            <div class="panel" id="panel-devices">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                    <div>
+                        <h2 style="font-size:18px;font-weight:800">Thiết bị đã đăng ký (UDID)</h2>
+                        <p style="font-size:13px;color:var(--text-muted);margin-top:4px" id="devices-subtitle">Đang tải…
+                        </p>
+                    </div>
+                    <div style="display:flex;gap:10px">
+                        <button class="btn btn-primary" onclick="signAllPending()">✍️ Ký tất cả chờ</button>
+                        <button class="btn btn-outline" onclick="loadDevices()">🔄 Tải lại</button>
+                    </div>
+                </div>
+
+                <div class="admin-table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Thiết bị</th>
+                                <th>UDID</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày ĐK</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devices-table-body">
+                            <tr>
+                                <td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">Đang tải…
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== PANEL: CERTIFICATES ==================== -->
+            <div class="panel" id="panel-certs">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                    <div>
+                        <h2 style="font-size:18px;font-weight:800">Chứng chỉ & Provisioning Profiles</h2>
+                        <p style="font-size:13px;color:var(--text-muted);margin-top:4px">File cert_legacy.p12 đang dùng
+                            để ký IPA</p>
+                    </div>
+                </div>
+
+                <div class="notif info" style="margin-bottom:20px" id="cert-status-notif">
+                    <div class="notif-icon">🔄</div>
+                    <div class="notif-content">
+                        <div class="notif-title">Đang kiểm tra chứng chỉ…</div>
+                    </div>
+                </div>
+
+                <!-- Primary cert card -->
+                <div class="cert-card">
+                    <div class="cert-card-header">
+                        <div>
+                            <div class="cert-name">🔐 cert_legacy.p12 <span
+                                    style="font-size:11px;color:var(--accent-blue);margin-left:6px">[ĐANG DÙNG]</span>
+                            </div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Mật khẩu: <code
+                                    style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:5px">1</code>
+                            </div>
+                        </div>
+                        <span class="badge badge-green"><span class="badge-dot"></span>Hoạt động</span>
+                    </div>
+                    <div class="cert-meta">
+                        <div class="cert-meta-item">
+                            <div class="cert-meta-label">File</div>
+                            <div class="cert-meta-value" style="font-family:monospace">cert_legacy.p12</div>
+                        </div>
+                        <div class="cert-meta-item">
+                            <div class="cert-meta-label">Provisioning</div>
+                            <div class="cert-meta-value" id="provision-status">Đang kiểm tra…</div>
+                        </div>
+                        <div class="cert-meta-item">
+                            <div class="cert-meta-label">Signing Tool</div>
+                            <div class="cert-meta-value">zsign → isign → mock</div>
+                        </div>
+                    </div>
+                    <div class="capacity-bar">
+                        <div class="capacity-bar-label"><span>Thiết bị đã dùng</span><span style="font-weight:700"
+                                id="device-capacity">Đang tính…</span></div>
+                        <div class="capacity-track">
+                            <div class="capacity-fill" id="capacity-fill-bar" style="width:10%"></div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:14px">
+                        <button class="btn btn-sm btn-primary" onclick="manualSign()">✍️ Ký IPA thủ công</button>
+                    </div>
+                </div>
+
+                <!-- Legacy cert -->
+                <div class="cert-card">
+                    <div class="cert-card-header">
+                        <div>
+                            <div class="cert-name">🔐 cert.p12 <span
+                                    style="font-size:11px;color:var(--text-muted);margin-left:6px">[Dự phòng]</span>
+                            </div>
+                        </div>
+                        <span class="badge badge-purple">Standby</span>
+                    </div>
+                    <div class="cert-meta">
+                        <div class="cert-meta-item">
+                            <div class="cert-meta-label">File</div>
+                            <div class="cert-meta-value" style="font-family:monospace">cert.p12</div>
+                        </div>
+                        <div class="cert-meta-item">
+                            <div class="cert-meta-label">Trạng thái</div>
+                            <div class="cert-meta-value" style="color:var(--text-muted)">Không active — đổi trong .env
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PANEL: RELEASES ==================== -->
+            <div class="panel" id="panel-releases">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                    <h2 style="font-size:18px;font-weight:800">Releases & Upload</h2>
+                    <button class="btn btn-outline" onclick="loadReleases()">🔄 Tải lại</button>
+                </div>
+
+                <div class="grid-2" style="margin-bottom:24px">
+                    <!-- Upload IPA -->
+                    <div
+                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px">
+                        <div style="font-size:15px;font-weight:700;margin-bottom:16px">📱 Upload IPA (iOS)</div>
+                        <div class="upload-area" id="upload-area-ipa">
+                            <input type="file" accept=".ipa" id="upload-input-ipa" style="display:none">
+                            <div class="upload-icon">📱</div>
+                            <h3>Kéo thả hoặc bấm để chọn IPA</h3>
+                            <p>Hỗ trợ file .ipa · Tối đa 500MB</p>
+                        </div>
+                        <div class="upload-progress" id="upload-progress-ipa">
+                            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                                <span id="ipa-upload-name">Đang upload…</span>
+                                <span id="ipa-upload-pct">0%</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar-fill" id="ipa-bar"></div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:14px">
+                            <input class="form-input" id="ipa-version" placeholder="Phiên bản (vd: 2.1.0)"
+                                style="flex:1" />
+                            <button class="btn btn-primary" onclick="uploadFile('ipa')">✍️ Upload & Publish</button>
+                        </div>
+                    </div>
+
+                    <!-- Upload APK / Windows -->
+                    <div
+                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px">
+                        <div style="font-size:15px;font-weight:700;margin-bottom:16px">🤖 Upload APK / 🪟 Windows</div>
+                        <div class="upload-area" id="upload-area-other">
+                            <input type="file" accept=".apk,.exe,.msix" id="upload-input-other" style="display:none">
+                            <div class="upload-icon">📦</div>
+                            <h3>Kéo thả APK, EXE hoặc MSIX</h3>
+                            <p>.apk · .exe · .msix · Tối đa 500MB</p>
+                        </div>
+                        <div class="upload-progress" id="upload-progress-other">
+                            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                                <span id="other-upload-name">Đang upload…</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar-fill" id="other-bar"></div>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:14px">
+                            <input class="form-input" id="other-version" placeholder="Phiên bản (vd: 2.1.0)"
+                                style="flex:1" />
+                            <button class="btn btn-primary" onclick="uploadFile('other')">📤 Upload & Publish</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Release History Table -->
+                <div class="admin-table-wrap">
+                    <div class="table-header">
+                        <div class="table-title">Lịch sử Releases</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Phiên bản</th>
+                                <th>Nền tảng</th>
+                                <th>Kích thước</th>
+                                <th>Chứng chỉ</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody id="releases-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Chưa có
+                                    release nào.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== PANEL: ANALYTICS ==================== -->
+            <div class="panel" id="panel-analytics">
+                <h2 style="font-size:18px;font-weight:800;margin-bottom:20px">📈 Analytics</h2>
+                <div class="stat-cards" style="margin-bottom:24px">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">📲</div>
+                        </div>
+                        <div class="stat-card-value" id="an-total">—</div>
+                        <div class="stat-card-label">Tổng cài đặt</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">🍎</div>
+                        </div>
+                        <div class="stat-card-value" id="an-ios">—</div>
+                        <div class="stat-card-label">iOS Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">📱</div>
+                        </div>
+                        <div class="stat-card-value" id="an-devices">—</div>
+                        <div class="stat-card-label">Thiết bị đăng ký</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div class="stat-card-icon">📦</div>
+                        </div>
+                        <div class="stat-card-value" id="an-releases">—</div>
+                        <div class="stat-card-label">Releases</div>
+                    </div>
+                </div>
+                <div class="notif info">
+                    <div class="notif-icon">📊</div>
+                    <div class="notif-content">
+                        <div class="notif-title">Dữ liệu thống kê</div>
+                        <div class="notif-body">Thống kê được tính toán từ sessions và devices trong database JSON.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PANEL: SETTINGS ==================== -->
+            <div class="panel" id="panel-settings">
+                <h2 style="font-size:18px;font-weight:800;margin-bottom:20px">⚙️ Cài đặt hệ thống</h2>
+                <div class="notif warning" style="margin-bottom:20px">
+                    <div class="notif-icon">⚙️</div>
+                    <div class="notif-content">
+                        <div class="notif-title">Cài đặt được lưu trong file .env trên server</div>
+                        <div class="notif-body">Thay đổi .env và restart server: <code
+                                style="background:rgba(255,255,255,0.07);padding:2px 8px;border-radius:4px">pm2 restart tuphim</code>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px">
+                    <div style="font-size:15px;font-weight:700;margin-bottom:16px">📋 Cấu hình hiện tại</div>
+                    <div style="display:flex;flex-direction:column;gap:12px;font-size:13px">
+                        <div
+                            style="display:flex;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px">
+                            <span style="color:var(--text-secondary)">Domain</span>
+                            <strong>tuphim.online</strong>
+                        </div>
+                        <div
+                            style="display:flex;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px">
+                            <span style="color:var(--text-secondary)">Certificate</span>
+                            <strong style="font-family:monospace">cert_legacy.p12 (pw: 1)</strong>
+                        </div>
+                        <div
+                            style="display:flex;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px">
+                            <span style="color:var(--text-secondary)">Signing Tool</span>
+                            <strong>zsign → isign → mock fallback</strong>
+                        </div>
+                        <div
+                            style="display:flex;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px">
+                            <span style="color:var(--text-secondary)">Database</span>
+                            <strong>JSON files (server/data/)</strong>
+                        </div>
+                        <div
+                            style="display:flex;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:8px">
+                            <span style="color:var(--text-secondary)">Admin Session</span>
+                            <strong>JWT · 8 giờ</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-danger" onclick="logout()">🚪 Đăng xuất</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../admin/admin.js"></script>
+    <script>
+        // ============================================================
+        // JWT AUTH GUARD — runs immediately
+        // ============================================================
+        const TOKEN_KEY = 'admin_token';
+
+        async function checkAuth() {
+            const token = sessionStorage.getItem(TOKEN_KEY);
+            if (!token) return redirectToLogin();
+
+            try {
+                const res = await fetch('/api/auth/verify', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (!data.valid) return redirectToLogin();
+
+                // Show page
+                document.getElementById('auth-guard').style.display = 'none';
+                document.getElementById('admin-username-display').textContent = `👤 ${data.username}`;
+
+                // Load initial data
+                loadDashboard();
+            } catch (e) {
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            sessionStorage.removeItem(TOKEN_KEY);
+            window.location.href = 'login.html';
+        }
+
+        function logout() {
+            sessionStorage.removeItem(TOKEN_KEY);
+            sessionStorage.removeItem('admin_path');
+            window.location.href = 'login.html';
+        }
+
+        function getAuthHeader() {
+            return { 'Authorization': `Bearer ${sessionStorage.getItem(TOKEN_KEY)}` };
+        }
+
+        // ============================================================
+        // API CALLS
+        // ============================================================
+        async function apiGet(path) {
+            const res = await fetch(`/api${path}`, { headers: getAuthHeader() });
+            if (res.status === 401) { redirectToLogin(); return null; }
+            return res.json();
+        }
+
+        async function apiPost(path, body) {
+            const res = await fetch(`/api${path}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+                body: JSON.stringify(body)
+            });
+            if (res.status === 401) { redirectToLogin(); return null; }
+            return res.json();
+        }
+
+        async function apiDelete(path) {
+            const res = await fetch(`/api${path}`, { method: 'DELETE', headers: getAuthHeader() });
+            if (res.status === 401) { redirectToLogin(); return null; }
+            return res.json();
+        }
+
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
+        async function loadDashboard() {
+            const stats = await apiGet('/admin/stats');
+            if (!stats) return;
+
+            document.getElementById('stat-installs').textContent = stats.totalInstalls.toLocaleString('vi-VN');
+            document.getElementById('stat-devices').textContent = stats.totalDevices.toLocaleString('vi-VN');
+            document.getElementById('stat-version').textContent = stats.latestVersion;
+            document.getElementById('stat-pending-badge').textContent = `${stats.pendingDevices} chờ`;
+
+            if (stats.pendingDevices > 0) {
+                document.getElementById('pending-text').textContent = `${stats.pendingDevices} thiết bị đang chờ ký IPA`;
+                document.getElementById('pending-warning').style.display = 'flex';
+            } else {
+                document.getElementById('pending-warning').style.display = 'none';
+            }
+
+            // Analytics
+            document.getElementById('an-total').textContent = stats.totalInstalls;
+            document.getElementById('an-ios').textContent = stats.totalInstalls;
+            document.getElementById('an-devices').textContent = stats.totalDevices;
+            document.getElementById('an-releases').textContent = stats.totalReleases;
+
+            // Update badge
+            const badge = document.getElementById('badge-pending');
+            badge.textContent = stats.pendingDevices;
+            badge.style.display = stats.pendingDevices > 0 ? 'inline' : 'none';
+
+            // Update cert capacity
+            const pct = Math.min(100, Math.round((stats.totalDevices / 100) * 100));
+            document.getElementById('device-capacity').textContent = `${stats.totalDevices} / 100 thiết bị (${pct}%)`;
+            const fill = document.getElementById('capacity-fill-bar');
+            if (fill) { fill.style.width = pct + '%'; if (pct > 70) fill.classList.add('warning'); }
+
+            loadSessions();
+        }
+
+        // ============================================================
+        // SESSIONS TABLE
+        // ============================================================
+        async function loadSessions() {
+            const sessions = await apiGet('/admin/sessions');
+            if (!sessions) return;
+            const tbody = document.getElementById('sessions-table-body');
+            if (!sessions.length) {
+                tbody.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px">Chưa có session nào.</div>';
+                return;
+            }
+            const rows = sessions.map(s => {
+                const statusMap = {
+                    waiting_udid: '<span class="badge badge-orange">Chờ UDID</span>',
+                    udid_received: '<span class="badge badge-blue">Đã nhận UDID</span>',
+                    signing: '<span class="badge badge-blue"><span class="badge-dot" style="animation:pulse 1s infinite"></span>Đang ký</span>',
+                    signed: '<span class="badge badge-green"><span class="badge-dot"></span>Đã ký</span>',
+                    sign_error: '<span class="badge badge-red">Lỗi ký</span>',
+                    no_ipa: '<span class="badge badge-orange">Chưa có IPA</span>',
+                };
+                const installBtn = s.installUrl ? `<a href="${s.installUrl}" class="btn btn-sm btn-success" target="_blank">📲 Link cài</a>` : '';
+                return `<table style="width:100%"><tr>
+      <td style="padding:12px 16px;font-size:12px;font-family:monospace;color:var(--text-muted)">${s.sessionId.slice(0, 12)}…</td>
+      <td style="padding:12px 16px;font-size:12px;color:var(--text-secondary)">${s.udid ? s.udid.slice(0, 20) + '…' : '—'}</td>
+      <td style="padding:12px 16px">${statusMap[s.status] || s.status}</td>
+      <td style="padding:12px 16px;font-size:11px;color:var(--text-muted)">${new Date(s.createdAt).toLocaleString('vi-VN')}</td>
+      <td style="padding:12px 16px">${installBtn}</td>
+    </tr></table>`;
+            });
+            tbody.innerHTML = `<table style="width:100%">
+    <thead><tr><th>Session ID</th><th>UDID</th><th>Trạng thái</th><th>Thời gian</th><th>Thao tác</th></tr></thead>
+    <tbody>${sessions.map(s => {
+                const statusMap = {
+                    waiting_udid: '<span class="badge badge-orange">Chờ UDID</span>',
+                    udid_received: '<span class="badge badge-blue">Nhận UDID</span>',
+                    signing: '<span class="badge badge-blue">Đang ký…</span>',
+                    signed: '<span class="badge badge-green"><span class="badge-dot"></span>Đã ký</span>',
+                    sign_error: '<span class="badge badge-red">Lỗi ký</span>',
+                    no_ipa: '<span class="badge badge-orange">Chưa có IPA</span>',
+                };
+                const installBtn = s.installUrl ? `<a href="${s.installUrl}" class="btn btn-sm btn-success" style="font-size:11px;text-decoration:none" target="_blank">📲 Cài</a>` : '';
+                return `<tr>
+        <td class="td-mono">${s.sessionId.slice(0, 14)}…</td>
+        <td class="td-mono">${s.udid ? s.udid.slice(0, 18) + '…' : '—'}</td>
+        <td>${statusMap[s.status] || s.status}</td>
+        <td style="font-size:11px;color:var(--text-muted)">${new Date(s.createdAt).toLocaleString('vi-VN')}</td>
+        <td>${installBtn}</td>
+      </tr>`;
+            }).join('')}</tbody>
+  </table>`;
+        }
+
+        // ============================================================
+        // DEVICES
+        // ============================================================
+        async function loadDevices() {
+            const devices = await apiGet('/admin/devices');
+            if (!devices) return;
+            document.getElementById('devices-subtitle').textContent = `Tổng ${devices.length} thiết bị`;
+            const tbody = document.getElementById('devices-table-body');
+            if (!devices.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">Chưa có thiết bị nào.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = devices.map(d => {
+                const statusMap = {
+                    pending: '<span class="badge badge-orange"><span class="badge-dot"></span>Chờ ký</span>',
+                    signed: '<span class="badge badge-green"><span class="badge-dot"></span>Đã ký</span>',
+                    installed: '<span class="badge badge-green"><span class="badge-dot"></span>Đã cài</span>',
+                };
+                return `<tr>
+      <td><div style="font-weight:600">${d.product}</div><div style="font-size:11px;color:var(--text-muted)">iOS ${d.iosVersion}</div></td>
+      <td class="td-mono">${d.udid}</td>
+      <td>${statusMap[d.status] || d.status}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${new Date(d.registeredAt).toLocaleDateString('vi-VN')}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        ${d.status === 'pending' ? `<button class="btn btn-sm btn-success" onclick="signForDevice('${d.udid}','${d.session}')">✍️ Ký</button>` : ''}
+        <button class="btn btn-sm btn-danger" onclick="deleteDeviceAction('${d.udid}')">🗑️</button>
+      </td>
+    </tr>`;
+            }).join('');
+        }
+
+        async function deleteDeviceAction(udid) {
+            if (!confirm(`Xoá thiết bị ${udid.slice(0, 20)}…?`)) return;
+            await apiDelete(`/admin/devices/${udid}`);
+            showToast('🗑️', 'Đã xoá thiết bị');
+            loadDevices();
+        }
+
+        async function signForDevice(udid, session) {
+            showToast('🔄', 'Đang ký IPA…');
+            const result = await apiPost('/admin/sign', { session, udid });
+            if (result?.success) { showToast('✅', 'IPA đã ký xong!'); loadDevices(); }
+            else showToast('❌', result?.error || 'Lỗi ký IPA');
+        }
+
+        async function signAllPending() {
+            const devices = await apiGet('/admin/devices');
+            if (!devices) return;
+            const pending = devices.filter(d => d.status === 'pending');
+            if (!pending.length) { showToast('✅', 'Không có thiết bị nào chờ ký!'); return; }
+            showToast('🔄', `Đang ký ${pending.length} thiết bị…`);
+            for (const d of pending) {
+                await apiPost('/admin/sign', { session: d.session, udid: d.udid });
+            }
+            showToast('✅', `Đã ký xong ${pending.length} IPA!`);
+            loadDevices();
+        }
+
+        // ============================================================
+        // RELEASES
+        // ============================================================
+        async function loadReleases() {
+            const releases = await apiGet('/admin/releases');
+            if (!releases) return;
+            const tbody = document.getElementById('releases-table-body');
+            if (!releases.length) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Chưa có release nào.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = releases.reverse().map(r => {
+                const platBadge = { ios: '<span class="badge badge-blue">🍎 iOS</span>', android: '<span class="badge badge-green">🤖 Android</span>', windows: '<span class="badge badge-cyan">🪟 Windows</span>' }[r.platform] || r.platform;
+                const sizeMB = r.fileSize ? (r.fileSize / 1024 / 1024).toFixed(1) + ' MB' : '—';
+                return `<tr>
+      <td><strong>${r.version}</strong>${r.active ? ' <span style="font-size:11px;color:var(--accent-blue)">LATEST</span>' : ''}</td>
+      <td>${platBadge}</td>
+      <td style="color:var(--text-secondary);font-size:13px">${sizeMB}</td>
+      <td><span class="badge badge-blue">${r.certUsed || '—'}</span></td>
+      <td>${r.active ? '<span class="badge badge-green"><span class="badge-dot"></span>Live</span>' : '<span class="badge badge-orange">Cũ</span>'}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${new Date(r.uploadedAt).toLocaleDateString('vi-VN')}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sm btn-outline" onclick="copyLink('${r.downloadUrl}')">🔗</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRelease('${r.id}')">🗑️</button>
+      </td>
+    </tr>`;
+            }).join('');
+        }
+
+        async function deleteRelease(id) {
+            if (!confirm('Xoá release này?')) return;
+            await apiDelete(`/admin/releases/${id}`);
+            showToast('🗑️', 'Đã xoá release');
+            loadReleases();
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(() => showToast('🔗', 'Link đã được copy!')).catch(() => showToast('❌', 'Không copy được'));
+        }
+
+        // ============================================================
+        // UPLOADING
+        // ============================================================
+        function uploadFile(type) {
+            const input = document.getElementById(type === 'ipa' ? 'upload-input-ipa' : 'upload-input-other');
+            const versionInput = document.getElementById(type === 'ipa' ? 'ipa-version' : 'other-version');
+            const file = input.files[0];
+            if (!file) { showToast('⚠️', 'Vui lòng chọn file trước!'); return; }
+            const version = versionInput.value.trim() || '1.0.0';
+
+            const progressDiv = document.getElementById(type === 'ipa' ? 'upload-progress-ipa' : 'upload-progress-other');
+            const bar = document.getElementById(type === 'ipa' ? 'ipa-bar' : 'other-bar');
+            const nameEl = document.getElementById(type === 'ipa' ? 'ipa-upload-name' : 'other-upload-name');
+            progressDiv.classList.add('show');
+            nameEl.textContent = file.name;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('version', version);
+            formData.append('setActive', 'true');
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/admin/upload');
+            xhr.setRequestHeader('Authorization', `Bearer ${sessionStorage.getItem(TOKEN_KEY)}`);
+
+            xhr.upload.onprogress = (e) => {
+                const pct = Math.round((e.loaded / e.total) * 100);
+                bar.style.width = pct + '%';
+                if (type === 'ipa') document.getElementById('ipa-upload-pct').textContent = pct + '%';
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    showToast('✅', `${file.name} đã upload thành công!`);
+                    loadReleases();
+                } else {
+                    showToast('❌', 'Upload thất bại. Kiểm tra lại server.');
+                }
+                progressDiv.classList.remove('show');
+                bar.style.width = '0%';
+            };
+
+            xhr.onerror = () => { showToast('❌', 'Lỗi kết nối khi upload.'); };
+            xhr.send(formData);
+        }
+
+        // ============================================================
+        // CERT INFO
+        // ============================================================
+        async function loadCertInfo() {
+            const info = await apiGet('/admin/cert-info');
+            if (!info) return;
+            const notif = document.getElementById('cert-status-notif');
+            if (info.certExists && info.provisionExists) {
+                notif.className = 'notif success';
+                notif.innerHTML = `<div class="notif-icon">✅</div><div class="notif-content"><div class="notif-title">${info.certFile} + ${info.provisionFile} — Đã sẵn sàng ký IPA</div></div>`;
+            } else {
+                notif.className = 'notif danger';
+                notif.innerHTML = `<div class="notif-icon">❌</div><div class="notif-content"><div class="notif-title">Thiếu file chứng chỉ — cert: ${info.certExists}, provision: ${info.provisionExists}</div></div>`;
+            }
+            document.getElementById('provision-status').textContent = info.provisionExists ? `${info.provisionFile} ✅` : '❌ Không tìm thấy';
+        }
+
+        function manualSign() {
+            const session = prompt('Nhập Session ID cần ký:');
+            if (!session) return;
+            signForDevice('manual', session);
+        }
+
+        // Override showPanel to load data
+        const _origShowPanel = window.showPanel;
+        window.showPanel = function (id, el) {
+            if (typeof _origShowPanel === 'function') _origShowPanel(id, el);
+            else {
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+                const panel = document.getElementById('panel-' + id);
+                if (panel) panel.classList.add('active');
+                if (el) el.classList.add('active');
+                const titles = { dashboard: '📊 Dashboard', devices: '📱 Thiết bị (UDID)', certs: '🔐 Chứng chỉ', releases: '📦 Releases', analytics: '📈 Analytics', settings: '⚙️ Cài đặt' };
+                document.getElementById('topbar-title').textContent = titles[id] || id;
+            }
+            if (id === 'devices') loadDevices();
+            else if (id === 'releases') loadReleases();
+            else if (id === 'certs') loadCertInfo();
+            else if (id === 'dashboard') loadDashboard();
+        };
+
+        // Start auth check
+        checkAuth();
+    </script>
+</body>
+
+</html>

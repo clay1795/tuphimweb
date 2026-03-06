@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TuPhim — Tải ứng dụng xem phim</title>
+    <meta name="description"
+        content="Tải ứng dụng TuPhim cho iOS, Android và Windows. Xem phim chất lượng cao, miễn phí hoàn toàn." />
+    <link rel="stylesheet" href="styles/main.css" />
+    <link rel="icon" href="assets/logo.png" />
+</head>
+
+<body>
+
+    <div class="bg-glow"></div>
+    <div class="bg-grid"></div>
+
+    <!-- ===================== NAVBAR ===================== -->
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <img src="assets/logo.png" alt="TuPhim" style="height:38px;width:auto;object-fit:contain;" />
+        </div>
+        <div class="navbar-links">
+            <a href="#features">Tính năng</a>
+            <a href="#platforms">Nền tảng</a>
+            <span class="navbar-badge">v2.1.0</span>
+        </div>
+    </nav>
+
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+        <div class="app-icon-hero" style="background:transparent;box-shadow:0 20px 60px rgba(79,142,247,0.2)">
+            <img src="assets/logo.png" alt="TuPhim" style="width:110px;height:110px;object-fit:contain;" />
+        </div>
+
+        <div class="hero-badge">
+            <span class="dot"></span>
+            Mới nhất — Phiên bản 2.1.0
+        </div>
+
+        <h1 class="hero-title">
+            Xem phim không giới hạn<br />
+            <span class="gradient-text">trên mọi thiết bị</span>
+        </h1>
+
+        <p class="hero-sub">
+            Tải ứng dụng TuPhim cho iPhone, Android và Windows. Kho phim khổng lồ,
+            chất lượng 4K, phụ đề tiếng Việt — hoàn toàn miễn phí.
+        </p>
+
+        <div class="hero-version">
+            <span>📦 v2.1.0 (Build 210)</span>
+            <span>•</span>
+            <span>🗓️ 06/03/2026</span>
+        </div>
+
+        <div class="hero-actions">
+            <button class="btn btn-lg btn-primary" id="btn-main-install">
+                <span>⬇️</span> Tải ứng dụng
+            </button>
+            <a href="#platforms" class="btn btn-lg btn-outline">
+                Xem tất cả nền tảng
+            </a>
+        </div>
+    </section>
+
+    <!-- ===================== STATS ===================== -->
+    <div class="stats-bar"
+        style="position:relative;z-index:1;margin-bottom:64px;max-width:700px;margin-left:auto;margin-right:auto">
+        <div class="stat-item">
+            <div class="stat-value blue" data-count="5280" data-suffix="+">0</div>
+            <div class="stat-label">Lượt cài đặt</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value green" data-count="12500" data-suffix="+">0</div>
+            <div class="stat-label">Phim & Series</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value purple" data-count="98" data-suffix="%">0</div>
+            <div class="stat-label">Đánh giá hài lòng</div>
+        </div>
+    </div>
+
+    <!-- ===================== INSTALL STATUS ===================== -->
+    <!-- Shows up when user returns after UDID registration -->
+    <div id="install-status-section"
+        style="display:none;position:relative;z-index:1;max-width:520px;margin:0 auto 48px;padding:0 24px">
+        <div class="glass-card" style="padding:28px;text-align:center" id="install-status-card">
+            <div style="font-size:36px;margin-bottom:12px" id="status-icon">⏳</div>
+            <h3 style="font-size:18px;font-weight:800;margin-bottom:8px" id="status-title">Đang ký IPA…</h3>
+            <p style="font-size:13px;color:var(--text-secondary)" id="status-desc">Máy chủ đang ký IPA riêng cho thiết
+                bị của bạn. Vui lòng chờ.</p>
+            <div class="progress-bar" style="margin:16px 0 0;height:4px">
+                <div class="progress-fill" id="status-progress"
+                    style="width:50%;animation:progressPulse 2s ease-in-out infinite"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== PLATFORMS ===================== -->
+    <section class="platforms-section" id="platforms">
+        <h2 class="section-title">Chọn nền tảng của bạn</h2>
+        <p class="section-sub">Hỗ trợ đầy đủ iOS, Android và Windows</p>
+
+        <div class="platforms-grid">
+            <div class="platform-card ios glass-card" onclick="iOSFlow.start()">
+                <div class="platform-icon ios">🍎</div>
+                <div class="platform-name">iPhone / iPad</div>
+                <div class="platform-desc">Cài đặt trực tiếp qua OTA. Yêu cầu đăng ký UDID một lần. Tương thích iOS 14.0
+                    trở lên.</div>
+                <div class="platform-meta">
+                    <span class="platform-tag blue">iOS 14.0+</span>
+                    <span class="platform-tag cyan">OTA Install</span>
+                </div>
+                <button class="btn btn-ios" style="width:100%">
+                    <span>🍎</span> Cài cho iPhone
+                </button>
+            </div>
+
+            <div class="platform-card android glass-card" onclick="startAndroidInstall()">
+                <div class="platform-icon android">🤖</div>
+                <div class="platform-name">Android</div>
+                <div class="platform-desc">Tải file APK và cài đặt trực tiếp. Cần bật "Nguồn không xác định" trong Cài
+                    đặt. Android 8.0+.</div>
+                <div class="platform-meta">
+                    <span class="platform-tag green">Android 8.0+</span>
+                    <span class="platform-tag cyan">APK</span>
+                </div>
+                <button class="btn btn-android" style="width:100%">
+                    <span>📥</span> Tải APK
+                </button>
+            </div>
+
+            <div class="platform-card windows glass-card" onclick="startWindowsInstall()">
+                <div class="platform-icon windows">🪟</div>
+                <div class="platform-name">Windows</div>
+                <div class="platform-desc">Tải bộ cài đặt cho Windows 10/11. Ứng dụng desktop đầy đủ tính năng với hiệu
+                    suất cao.</div>
+                <div class="platform-meta">
+                    <span class="platform-tag cyan">Windows 10/11</span>
+                    <span class="platform-tag blue">EXE Installer</span>
+                </div>
+                <button class="btn btn-windows" style="width:100%">
+                    <span>🪟</span> Tải cho Windows
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section class="features-section" id="features">
+        <h2 class="section-title">Tại sao chọn TuPhim?</h2>
+        <p class="section-sub">Ứng dụng xem phim tốt nhất, nhanh nhất</p>
+        <div class="features-grid">
+            <div class="feature-card glass-card">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Tốc độ cao</div>
+                <div class="feature-desc">Stream phim 4K mượt mà, không giật lag với CDN tốc độ cao toàn cầu.</div>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">🎞️</div>
+                <div class="feature-title">Kho phim khổng lồ</div>
+                <div class="feature-desc">Hơn 12.500 bộ phim và series, cập nhật mỗi ngày từ các nguồn uy tín.</div>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">🌐</div>
+                <div class="feature-title">Phụ đề Việt</div>
+                <div class="feature-desc">Toàn bộ phim có phụ đề tiếng Việt, nhiều phim có lồng tiếng.</div>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">📴</div>
+                <div class="feature-title">Xem offline</div>
+                <div class="feature-desc">Tải phim về xem khi không có mạng. Dung lượng tối ưu, chất lượng cao.</div>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">An toàn & Bảo mật</div>
+                <div class="feature-desc">Không quảng cáo, không theo dõi. Quyền riêng tư người dùng được bảo vệ tuyệt
+                    đối.</div>
+            </div>
+            <div class="feature-card glass-card">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Cập nhật tự động</div>
+                <div class="feature-desc">App tự thông báo khi có phiên bản mới. Cài đặt nhanh chóng chỉ 1 bấm.</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 TuPhim. Ứng dụng phân phối nội dung phim ảnh.</p>
+        <p style="margin-top:8px;font-size:12px;">
+            <a href="#" style="color:var(--text-muted)">Điều khoản</a> ·
+            <a href="#" style="color:var(--text-muted)">Quyền riêng tư</a>
+        </p>
+    </footer>
+
+    <!-- ===================== MODAL: IOS UDID FLOW ===================== -->
+    <div class="modal-overlay" id="modal-ios">
+        <div class="modal" id="ios-modal-content">
+            <button class="modal-close" id="close-ios-modal">✕</button>
+            <div class="modal-icon">🍎</div>
+            <h2 class="modal-title">Cài đặt TuPhim cho iPhone</h2>
+            <p class="modal-sub">
+                Vì đây là ứng dụng phân phối qua chứng chỉ cá nhân, bạn cần đăng ký thiết bị một lần.
+                Quá trình này chỉ mất ~60 giây.
+            </p>
+            <div class="progress-bar" style="margin-bottom:20px">
+                <div class="progress-fill" style="width:0%"></div>
+            </div>
+            <div class="steps" id="ios-steps">
+                <div class="step active">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Tải Profile đăng ký</div>
+                        <div class="step-desc">Tải file .mobileconfig để iPhone gửi UDID về máy chủ</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Cài profile trong Cài đặt</div>
+                        <div class="step-desc">Vào Cài đặt → Đã tải về profile → Cài đặt → Nhập mật khẩu</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Máy chủ nhận UDID & ký IPA</div>
+                        <div class="step-desc">Máy chủ đang ký IPA riêng cho thiết bị của bạn…</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <div class="step-title">IPA sẵn sàng — Cài ngay!</div>
+                        <div class="step-desc">Ứng dụng đã được ký riêng cho thiết bị của bạn</div>
+                    </div>
+                </div>
+            </div>
+            <div class="signing-status"
+                style="display:none;align-items:center;gap:10px;margin-bottom:20px;padding:14px;border-radius:var(--radius-md);background:rgba(79,142,247,0.08);border:1px solid rgba(79,142,247,0.2)">
+                <div class="spinner"></div>
+                <span style="font-size:14px;color:var(--accent-blue)">Đang ký IPA với chứng chỉ của bạn…</span>
+            </div>
+            <div id="ios-install-ready" style="display:none">
+                <div class="install-ready">
+                    <div class="install-ready-icon">✅</div>
+                    <h3>IPA đã sẵn sàng!</h3>
+                    <p>Thiết bị của bạn đã được đăng ký và IPA đã được ký riêng. Bấm nút bên dưới để cài đặt.</p>
+                    <a href="#" id="btn-install-now" class="btn btn-lg btn-ios"
+                        style="display:inline-flex;width:100%;justify-content:center">
+                        <span>📲</span> Cài ngay trên iPhone
+                    </a>
+                    <p style="margin-top:12px;font-size:12px;color:var(--text-muted)">
+                        iOS sẽ hỏi xác nhận. Chọn <strong style="color:var(--text-secondary)">Cài đặt</strong> để tiếp
+                        tục.
+                    </p>
+                </div>
+            </div>
+            <div id="ios-profile-btn-area">
+                <button id="btn-download-profile" class="btn btn-ios" style="width:100%;justify-content:center">
+                    <span>⬇️</span> Tải Profile đăng ký UDID
+                </button>
+                <p style="margin-top:12px;font-size:12px;color:var(--text-muted);text-align:center">
+                    🔒 Profile chỉ đọc UDID thiết bị. Không thu thập dữ liệu cá nhân.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== MODAL: PLATFORM SELECTOR ===================== -->
+    <div class="modal-overlay" id="modal-platforms">
+        <div class="modal" style="max-width:420px">
+            <button class="modal-close">✕</button>
+            <img src="assets/logo.png" alt="TuPhim"
+                style="height:64px;width:auto;object-fit:contain;margin-bottom:12px" />
+            <h2 class="modal-title">Chọn nền tảng</h2>
+            <p class="modal-sub">Bạn đang dùng thiết bị nào?</p>
+            <div style="display:flex;flex-direction:column;gap:12px">
+                <button id="btn-ios-install" class="btn btn-ios" style="justify-content:flex-start;padding:16px 20px">
+                    <span style="font-size:22px">🍎</span>
+                    <div style="text-align:left">
+                        <div style="font-size:15px;font-weight:700">iPhone / iPad</div>
+                        <div style="font-size:12px;opacity:.75;font-weight:400">iOS 14.0+ · OTA Install</div>
+                    </div>
+                </button>
+                <button id="btn-android-install" class="btn btn-android"
+                    style="justify-content:flex-start;padding:16px 20px">
+                    <span style="font-size:22px">🤖</span>
+                    <div style="text-align:left">
+                        <div style="font-size:15px;font-weight:700">Android</div>
+                        <div style="font-size:12px;opacity:.75;font-weight:400">Android 8.0+ · APK</div>
+                    </div>
+                </button>
+                <button id="btn-windows-install" class="btn btn-windows"
+                    style="justify-content:flex-start;padding:16px 20px">
+                    <span style="font-size:22px">🪟</span>
+                    <div style="text-align:left">
+                        <div style="font-size:15px;font-weight:700">Windows</div>
+                        <div style="font-size:12px;opacity:.75;font-weight:400">Windows 10/11 · EXE Installer</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes progressPulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: 0.5
+            }
+        }
+    </style>
+
+    <script src="scripts/app.js"></script>
+</body>
+
+</html>

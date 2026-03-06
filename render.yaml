@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: tuphim-distribution
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: |
+      cd server && npm install
+      apt-get update -y && apt-get install -y clang git libssl-dev libminizip-dev || true
+      git clone https://github.com/zhlynn/zsign.git /tmp/zsign && cd /tmp/zsign && make && cp zsign /usr/local/bin/ || true
+    startCommand: cd server && node server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: APP_DOMAIN
+        fromInput: true
+        defaultValue: https://tuphim.online
+      - key: ADMIN_SECRET_PATH
+        fromInput: true
+        defaultValue: qltv-tp8x2024
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: ADMIN_USERNAME
+        fromInput: true
+        defaultValue: tuphim_admin
+      - key: ADMIN_PASSWORD_HASH
+        fromInput: true
+      - key: CERT_PATH
+        value: ../certificate/cert_legacy.p12
+      - key: CERT_PASSWORD
+        value: "1"
+      - key: PROVISION_PATH
+        value: ../certificate/cert.mobileprovision
+      - key: APP_NAME
+        value: TuPhim
+      - key: BUNDLE_ID
+        value: com.tophim.app
+      - key: APP_VERSION
+        value: 2.1.0
+      - key: STORAGE_PATH
+        value: ./storage
+      - key: MAX_UPLOAD_MB
+        value: "500"
+    disk:
+      name: tuphim-storage
+      mountPath: /opt/render/project/src/server/storage
+      sizeGB: 5

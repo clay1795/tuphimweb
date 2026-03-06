@@ -1,0 +1,30 @@
+# Node.js
+node_modules/
+npm-debug.log*
+
+# Environment (NEVER commit!)
+server/.env
+
+# Storage (large binary files - upload via admin panel)
+server/storage/ipa/
+server/storage/apk/
+server/storage/windows/
+server/storage/signed/
+
+# Database (auto-generated)
+server/data/
+
+# Logs
+logs/
+*.log
+
+# Build
+dist/
+.DS_Store
+Thumbs.db
+
+# Keep certificate folder structure but NOT the actual cert files
+# (Upload certificates separately via secure transfer)
+certificate/*.p12
+certificate/*.pem
+certificate/*.mobileprovision
