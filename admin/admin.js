@@ -99,6 +99,52 @@ function deleteDevice(udid) {
 function revokeCert(certId) { showToast('⚠️', `Chứng chỉ ${certId} đã bị thu hồi. Cần ký lại tất cả IPA.`); }
 function renewCert(certId) { showToast('🔄', `Đang gia hạn chứng chỉ ${certId}…`); setTimeout(() => showToast('✅', 'Chứng chỉ đã được gia hạn!'), 2000); }
 
+// --- GUIDE URL SETTINGS ---
+const ADMIN_API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:3001/api/admin'
+    : '/api/admin';
+
+async function loadGuideUrls() {
+    try {
+        const token = sessionStorage.getItem('adminToken');
+        const res = await fetch(`${ADMIN_API}/settings`, {
+            headers: token ? { 'Authorization': 'Bearer ' + token } : {}
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        const iosInput = document.getElementById('input-ios-guide');
+        const andInput = document.getElementById('input-android-guide');
+        if (iosInput && data.iosGuideUrl) iosInput.value = data.iosGuideUrl;
+        if (andInput && data.androidGuideUrl) andInput.value = data.androidGuideUrl;
+    } catch (e) {
+        // Settings load failed silently — server might not have auth token yet
+    }
+}
+
+async function saveGuideUrls() {
+    const iosUrl = (document.getElementById('input-ios-guide')?.value || '').trim();
+    const androidUrl = (document.getElementById('input-android-guide')?.value || '').trim();
+    try {
+        const token = sessionStorage.getItem('adminToken');
+        const res = await fetch(`${ADMIN_API}/settings`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+            },
+            body: JSON.stringify({ iosGuideUrl: iosUrl, androidGuideUrl: androidUrl })
+        });
+        if (res.ok) {
+            showToast('✅', 'Link hướng dẫn đã được lưu!');
+        } else {
+            const err = await res.json();
+            showToast('❌', err.error || 'Lỗi khi lưu cài đặt');
+        }
+    } catch (e) {
+        showToast('❌', 'Không thể kết nối server: ' + e.message);
+    }
+}
+
 // --- ANIMATE BARS ---
 function animateBars() {
     document.querySelectorAll('.bar[data-height]').forEach(bar => {
@@ -118,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initUploadArea('upload-area-ipa', 'upload-input-ipa');
     initUploadArea('upload-area-provision', 'upload-input-provision');
     animateBars();
+    loadGuideUrls();
 
     // Animate stat counters
     document.querySelectorAll('[data-count]').forEach(el => {

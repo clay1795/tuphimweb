@@ -13,11 +13,18 @@ const FILES = {
     devices: path.join(DATA_DIR, 'devices.json'),
     sessions: path.join(DATA_DIR, 'sessions.json'),
     releases: path.join(DATA_DIR, 'releases.json'),
+    settings: path.join(DATA_DIR, 'settings.json'),
 };
 
 // Ensure data directory and files exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-Object.values(FILES).forEach(f => { if (!fs.existsSync(f)) fs.writeFileSync(f, '[]', 'utf-8'); });
+// Array files
+[FILES.devices, FILES.sessions, FILES.releases].forEach(f => { if (!fs.existsSync(f)) fs.writeFileSync(f, '[]', 'utf-8'); });
+// Settings file (object)
+if (!fs.existsSync(FILES.settings)) fs.writeFileSync(FILES.settings, JSON.stringify({
+    iosGuideUrl: '',
+    androidGuideUrl: ''
+}, null, 2), 'utf-8');
 
 function read(file) {
     try { return JSON.parse(fs.readFileSync(file, 'utf-8')); }
@@ -134,8 +141,23 @@ function deleteRelease(id) {
     write(FILES.releases, releases);
 }
 
+// ============================================================
+// SETTINGS
+// ============================================================
+function getSettings() {
+    try { return JSON.parse(fs.readFileSync(FILES.settings, 'utf-8')); }
+    catch { return {}; }
+}
+function saveSettings(updates) {
+    const current = getSettings();
+    const merged = Object.assign(current, updates);
+    fs.writeFileSync(FILES.settings, JSON.stringify(merged, null, 2), 'utf-8');
+    return merged;
+}
+
 module.exports = {
     getDevices, addDevice, updateDeviceStatus, deleteDevice,
     getSessions, getSession, createSession, updateSession,
-    getReleases, addRelease, deactivateReleases, deleteRelease
+    getReleases, addRelease, deactivateReleases, deleteRelease,
+    getSettings, saveSettings
 };

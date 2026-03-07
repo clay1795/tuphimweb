@@ -92,6 +92,32 @@ app.get('/api/health', (req, res) => {
 });
 
 // ============================================================
+// PUBLIC APP INFO — used by frontend to get version & guide URLs
+// ============================================================
+app.get('/api/info', (req, res) => {
+    const db = require('./utils/db');
+    const releases = db.getReleases();
+    const settings = db.getSettings();
+
+    const latestIOS = releases.find(r => r.platform === 'ios' && r.active);
+    const latestAndroid = releases.find(r => r.platform === 'android' && r.active);
+    const latestWindows = releases.find(r => r.platform === 'windows' && r.active);
+
+    const version = latestIOS?.version || latestAndroid?.version || process.env.APP_VERSION || '2.1.0';
+    const updatedAt = latestIOS?.uploadedAt || latestAndroid?.uploadedAt || null;
+
+    res.json({
+        version,
+        updatedAt,
+        hasIPA: !!latestIOS,
+        hasAPK: !!latestAndroid,
+        hasWindows: !!latestWindows,
+        iosGuideUrl: settings.iosGuideUrl || '',
+        androidGuideUrl: settings.androidGuideUrl || '',
+    });
+});
+
+// ============================================================
 // SERVE STATIC FRONTEND (for production)
 // When deployed, Nginx serves frontend directly.
 // This is just for local dev convenience.

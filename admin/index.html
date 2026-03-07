@@ -783,6 +783,35 @@
                         </div>
                     </div>
 
+                    <!-- Guide URLs -->
+                    <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px"
+                        id="guide-url-card">
+                        <div style="font-size:15px;font-weight:700;margin-bottom:6px">🔗 Link hướng dẫn cài đặt</div>
+                        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
+                            Link này sẽ xuất hiện dưới nút "Tải IPA" / "Tải APK" trong modal download của trang chính.
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">🍎 iOS — Link hướng dẫn cài IPA</label>
+                            <input class="form-input" id="input-ios-guide" placeholder="https://..."
+                                style="font-family:monospace;font-size:13px" />
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
+                                Ví dụ: link bài viết hướng dẫn Sideloadly, AltStore, TrollStore…
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">🤖 Android — Link hướng dẫn cài APK</label>
+                            <input class="form-input" id="input-android-guide" placeholder="https://..."
+                                style="font-family:monospace;font-size:13px" />
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
+                                Ví dụ: link bài viết hướng dẫn bật nguồn không xác định…
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="saveGuideUrls()"
+                            style="width:100%;justify-content:center">
+                            💾 Lưu cài đặt hướng dẫn
+                        </button>
+                    </div>
+
                     <!-- System Settings -->
                     <div
                         style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px">

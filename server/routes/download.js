@@ -37,6 +37,17 @@ router.get('/ipa/:filename', (req, res) => {
 });
 
 // ============================================================
+// GET /api/download/ios — serve latest active IPA directly
+// ============================================================
+router.get('/ios', (req, res) => {
+    const releases = db.getReleases();
+    const latest = releases.find(r => r.platform === 'ios' && r.active);
+    if (!latest) return res.status(404).json({ error: 'Chưa có IPA nào được upload.' });
+    if (!fs.existsSync(latest.filePath)) return res.status(404).json({ error: 'File IPA không tìm thấy trên server.' });
+    res.download(latest.filePath, `TuPhim-${latest.version}.ipa`);
+});
+
+// ============================================================
 // GET /api/download/apk — redirect to latest APK
 // ============================================================
 router.get('/apk', (req, res) => {

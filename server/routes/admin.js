@@ -156,4 +156,24 @@ router.get('/sessions', (req, res) => {
     res.json(db.getSessions().slice(-50).reverse()); // last 50
 });
 
+// ============================================================
+// GET /api/admin/settings
+// ============================================================
+router.get('/settings', (req, res) => {
+    res.json(db.getSettings());
+});
+
+// ============================================================
+// PUT /api/admin/settings
+// ============================================================
+router.put('/settings', (req, res) => {
+    const allowed = ['iosGuideUrl', 'androidGuideUrl'];
+    const updates = {};
+    allowed.forEach(key => {
+        if (req.body[key] !== undefined) updates[key] = req.body[key];
+    });
+    const settings = db.saveSettings(updates);
+    res.json({ success: true, settings });
+});
+
 module.exports = router;
