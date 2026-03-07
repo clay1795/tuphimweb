@@ -1,5 +1,5 @@
 // ============================================================
-// TuPhim Admin Panel â€” admin.js
+// TuPhim Admin Panel — admin.js
 // Real API-connected: upload, releases list, guide settings
 // ============================================================
 
@@ -20,7 +20,7 @@ function showPanel(id, el) {
     document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
     document.getElementById('panel-' + id).classList.add('active');
     if (el) el.classList.add('active');
-    const titles = { dashboard: 'Dashboard', releases: 'Upload & Releases', settings: 'CÃ i Ä‘áº·t' };
+    const titles = { dashboard: 'Dashboard', releases: 'Upload & Releases', settings: 'Cài đặt' };
     document.getElementById('topbar-title').textContent = titles[id] || id;
     if (id === 'dashboard') loadDashboard();
     if (id === 'releases') loadReleases();
@@ -41,7 +41,7 @@ function showToast(msg, type = 'info') {
         document.body.appendChild(t);
     }
     const colors = { success: '#10b981', error: '#ef4444', info: '#4f8ef7', warn: '#f59e0b' };
-    const icons = { success: 'âœ“', error: 'âœ-', info: 'â„¹', warn: 'âš ' };
+    const icons = { success: '✓', error: '✗', info: 'ℹ', warn: '⚠' };
     t.innerHTML = `<span style="color:${colors[type]};font-size:18px;font-weight:bold">${icons[type]}</span><span>${msg}</span>`;
     setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
     clearTimeout(t._timer);
@@ -66,10 +66,10 @@ async function loadDashboard() {
         // Stats
         if (statsRes.ok) {
             const s = await statsRes.json();
-            setText('stat-total-releases', s.totalReleases ?? 'â€”');
-            setText('stat-active-releases', s.activeReleases ?? 'â€”');
-            setText('stat-latest-ver', s.latestVersion || 'â€”');
-            document.getElementById('server-status').textContent = 'â- Hoáº¡t Ä‘á»™ng';
+            setText('stat-total-releases', s.totalReleases ?? '—');
+            setText('stat-active-releases', s.activeReleases ?? '—');
+            setText('stat-latest-ver', s.latestVersion || '—');
+            document.getElementById('server-status').textContent = '● Hoạt động';
             document.getElementById('server-status').style.color = 'var(--accent-green)';
         }
 
@@ -78,9 +78,9 @@ async function loadDashboard() {
             const releases = await releasesRes.json();
             const active = r => releases.find(x => x.platform === r && x.active);
             const iosR = active('ios'), andR = active('android'), winR = active('windows');
-            setStatus('psi-ios-status', iosR, iosR ? `v${iosR.version} Â· ${fmtSize(iosR.fileSize)}` : 'ChÆ°a cÃ³ IPA');
-            setStatus('psi-android-status', andR, andR ? `v${andR.version} Â· ${fmtSize(andR.fileSize)}` : 'ChÆ°a cÃ³ APK');
-            setStatus('psi-windows-status', winR, winR ? `v${winR.version} Â· ${fmtSize(winR.fileSize)}` : 'ChÆ°a cÃ³ EXE');
+            setStatus('psi-ios-status', iosR, iosR ? `v${iosR.version} · ${fmtSize(iosR.fileSize)}` : 'Chưa có IPA');
+            setStatus('psi-android-status', andR, andR ? `v${andR.version} · ${fmtSize(andR.fileSize)}` : 'Chưa có APK');
+            setStatus('psi-windows-status', winR, winR ? `v${winR.version} · ${fmtSize(winR.fileSize)}` : 'Chưa có EXE');
 
             // Last upload date
             const sorted = [...releases].sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
@@ -88,11 +88,11 @@ async function loadDashboard() {
                 const d = new Date(sorted[0].uploadedAt);
                 setText('stat-last-upload', d.toLocaleDateString('vi-VN'));
             } else {
-                setText('stat-last-upload', 'â€”');
+                setText('stat-last-upload', '—');
             }
         }
     } catch (e) {
-        document.getElementById('server-status').textContent = 'â- Máº¥t káº¿t ná»‘i';
+        document.getElementById('server-status').textContent = '● Mất kết nối';
         document.getElementById('server-status').style.color = 'var(--accent-orange)';
     }
 }
@@ -103,19 +103,19 @@ async function loadDashboard() {
 async function loadReleases() {
     const tbody = document.getElementById('releases-tbody');
     if (!tbody) return;
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Äang táº£iâ€¦</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Đang tải…</td></tr>`;
     try {
         const res = await fetch(`${ADMIN_API}/releases`, { headers: authHeaders() });
-        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lá»-i táº£i danh sÃ¡ch</td></tr>`; return; }
+        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lỗi tải danh sách</td></tr>`; return; }
         const releases = await res.json();
         if (!releases.length) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">ChÆ°a cÃ³ release nÃ o. Upload file á»Ÿ trÃªn Ä‘á»ƒ báº¯t Ä‘áº§u.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Chưa có release nào. Upload file ở trên để bắt đầu.</td></tr>`;
             return;
         }
         // Sort newest first
         releases.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
         tbody.innerHTML = releases.map(r => {
-            const platIcons = { ios: 'ðŸŽ', android: 'ðŸ¤–', windows: 'ðŸªŸ' };
+            const platIcons = { ios: '🍎', android: '🤖', windows: '🪟' };
             const platLabels = { ios: 'iOS', android: 'Android', windows: 'Windows' };
             const platColors = { ios: 'badge-blue', android: 'badge-green', windows: 'badge-purple' };
             const date = new Date(r.uploadedAt).toLocaleDateString('vi-VN');
@@ -123,25 +123,25 @@ async function loadReleases() {
         <td><span class="badge ${platColors[r.platform]}">${platIcons[r.platform]} ${platLabels[r.platform]}</span></td>
         <td><strong>v${r.version}</strong></td>
         <td style="color:var(--text-secondary);font-size:13px">${fmtSize(r.fileSize)}</td>
-        <td>${r.active ? '<span class="badge badge-green"><span class="badge-dot"></span>Live</span>' : '<span class="badge badge-gray">CÅ©</span>'}</td>
+        <td>${r.active ? '<span class="badge badge-green"><span class="badge-dot"></span>Live</span>' : '<span class="badge badge-gray">Cũ</span>'}</td>
         <td style="font-size:12px;color:var(--text-secondary)">${date}</td>
         <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteRelease('${r.id}')">XoÃ¡</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteRelease('${r.id}')">Xoá</button>
         </td>
       </tr>`;
         }).join('');
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lá»-i káº¿t ná»‘i server</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lỗi kết nối server</td></tr>`;
     }
 }
 
 async function deleteRelease(id) {
-    if (!confirm('XoÃ¡ release nÃ y?')) return;
+    if (!confirm('Xoá release này?')) return;
     try {
         const res = await fetch(`${ADMIN_API}/releases/${id}`, { method: 'DELETE', headers: authHeaders() });
-        if (res.ok) { showToast('ÄÃ£ xoÃ¡ release!', 'success'); loadReleases(); loadDashboard(); }
-        else showToast('Lá»-i khi xoÃ¡', 'error');
-    } catch { showToast('KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c server', 'error'); }
+        if (res.ok) { showToast('Đã xoá release!', 'success'); loadReleases(); loadDashboard(); }
+        else showToast('Lỗi khi xoá', 'error');
+    } catch { showToast('Không kết nối được server', 'error'); }
 }
 
 // ============================================================
@@ -181,14 +181,14 @@ function initDragDrop(type) {
 
 async function uploadFile(type) {
     const file = selectedFiles[type];
-    if (!file) return showToast('Chá»n file trÆ°á»›c!', 'warn');
+    if (!file) return showToast('Chọn file trước!', 'warn');
     const verInput = document.getElementById('ver-' + type);
     const version = verInput?.value?.trim() || '1.0.0';
     const setActive = document.getElementById('active-' + type)?.checked;
 
     const ext = file.name.split('.').pop().toLowerCase();
     const validMap = { ipa: ['ipa'], apk: ['apk'], win: ['exe', 'msix'] };
-    if (!validMap[type]?.includes(ext)) return showToast(`File khÃ´ng há»£p lá»‡ (.${ext})`, 'error');
+    if (!validMap[type]?.includes(ext)) return showToast(`File không hợp lệ (.${ext})`, 'error');
 
     const formData = new FormData();
     formData.append('file', file);
@@ -203,7 +203,7 @@ async function uploadFile(type) {
     if (prog) { prog.style.display = 'block'; progName.textContent = file.name; }
 
     const btn = document.getElementById('btn-upload-' + type);
-    btn.disabled = true; btn.textContent = 'Äang uploadâ€¦';
+    btn.disabled = true; btn.textContent = 'Đang upload…';
 
     try {
         await new Promise((resolve, reject) => {
@@ -219,12 +219,12 @@ async function uploadFile(type) {
             };
             xhr.onload = () => {
                 if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
-                else reject(new Error(JSON.parse(xhr.responseText)?.error || 'Upload tháº¥t báº¡i'));
+                else reject(new Error(JSON.parse(xhr.responseText)?.error || 'Upload thất bại'));
             };
-            xhr.onerror = () => reject(new Error('Lá»-i máº¡ng'));
+            xhr.onerror = () => reject(new Error('Lỗi mạng'));
             xhr.send(formData);
         });
-        showToast(`Upload thÃ nh cÃ´ng! v${version}`, 'success');
+        showToast(`Upload thành công! v${version}`, 'success');
         if (prog) { progFill.style.width = '100%'; progPct.textContent = '100%'; }
         // Reset
         selectedFiles[type] = null;
@@ -233,8 +233,8 @@ async function uploadFile(type) {
         const drop = document.getElementById('drop-' + type);
         if (drop) {
             drop.style.borderColor = ''; drop.style.background = '';
-            drop.querySelector('.dz-text').innerHTML = `KÃ©o tháº£ file <strong>.${validMap[type][0]}</strong> vÃ o Ä‘Ã¢y`;
-            drop.querySelector('.dz-sub').textContent = 'hoáº·c báº¥m Ä‘á»ƒ chá»n file';
+            drop.querySelector('.dz-text').innerHTML = `Kéo thả file <strong>.${validMap[type][0]}</strong> vào đây`;
+            drop.querySelector('.dz-sub').textContent = 'hoặc bấm để chọn file';
         }
         setTimeout(() => { if (prog) prog.style.display = 'none'; }, 1500);
         loadReleases(); loadDashboard();
@@ -269,9 +269,9 @@ async function saveGuideUrls() {
             headers: authHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ iosGuideUrl: iosUrl, androidGuideUrl: androidUrl })
         });
-        if (res.ok) showToast('ÄÃ£ lÆ°u cÃ i Ä‘áº·t!', 'success');
-        else showToast('Lá»-i khi lÆ°u', 'error');
-    } catch { showToast('KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c server', 'error'); }
+        if (res.ok) showToast('Đã lưu cài đặt!', 'success');
+        else showToast('Lỗi khi lưu', 'error');
+    } catch { showToast('Không kết nối được server', 'error'); }
 }
 
 // ============================================================
@@ -279,7 +279,7 @@ async function saveGuideUrls() {
 // ============================================================
 function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
 function fmtSize(bytes) {
-    if (!bytes) return 'â€”';
+    if (!bytes) return '—';
     const mb = bytes / 1024 / 1024;
     return mb >= 1 ? mb.toFixed(1) + ' MB' : (bytes / 1024).toFixed(0) + ' KB';
 }
@@ -294,7 +294,7 @@ function refreshData() {
     if (active === 'dashboard') loadDashboard();
     if (active === 'releases') loadReleases();
     if (active === 'settings') loadGuideUrls();
-    showToast('ÄÃ£ lÃ m má»›i dá»¯ liá»‡u', 'info');
+    showToast('Đã làm mới dữ liệu', 'info');
 }
 
 // ---- Clock ----
