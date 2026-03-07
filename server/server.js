@@ -123,6 +123,12 @@ app.get('/api/info', (req, res) => {
 // This is just for local dev convenience.
 // ============================================================
 const frontendPath = path.join(__dirname, '..');
+
+// Block /admin path — it should not be accessible, only /qltv-tp8x2024/
+app.use('/admin', (req, res) => {
+    res.status(404).json({ error: 'Not found' });
+});
+
 app.use(express.static(frontendPath));
 
 // ============================================================
