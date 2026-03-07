@@ -38,23 +38,41 @@ const PORT = process.env.PORT || 3001;
 app.disable('x-powered-by');
 
 // ============================================================
-// SECURITY: Headers (helmet-lite, no dependencies)
+// SECURITY: Helmet (comprehensive headers + CSP)
 // ============================================================
-app.use((req, res, next) => {
-    // Prevent clickjacking
-    res.setHeader('X-Frame-Options', 'DENY');
-    // Prevent MIME-type sniffing
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    // XSS protection (legacy browsers)
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    // No referrer leak
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    // HSTS (only meaningful over HTTPS)
-    res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
-    // Permissions policy
-    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    next();
-});
+let helmet;
+try { helmet = require('helmet'); } catch { helmet = null; }
+
+if (helmet) {
+    app.use(helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://fonts.googleapis.com"],
+                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                imgSrc: ["'self'", "data:", "https:"],
+                connectSrc: ["'self'"],
+                frameSrc: ["'none'"],
+                objectSrc: ["'none'"],
+                upgradeInsecureRequests: [],
+            },
+        },
+        crossOriginEmbedderPolicy: false, // Allow external resources
+        referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+    }));
+} else {
+    // Fallback manual headers (before helmet is installed)
+    app.use((req, res, next) => {
+        res.setHeader('X-Frame-Options', 'DENY');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('X-XSS-Protection', '1; mode=block');
+        res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+        res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        next();
+    });
+}
 
 // ============================================================
 // CORS — restrict to known origins
