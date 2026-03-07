@@ -1,4 +1,4 @@
-﻿// ============================================================
+// ============================================================
 // TuPhim Admin Panel â€” admin.js
 // Real API-connected: upload, releases list, guide settings
 // ============================================================
@@ -41,7 +41,7 @@ function showToast(msg, type = 'info') {
         document.body.appendChild(t);
     }
     const colors = { success: '#10b981', error: '#ef4444', info: '#4f8ef7', warn: '#f59e0b' };
-    const icons = { success: 'âœ“', error: 'âœ—', info: 'â„¹', warn: 'âš ' };
+    const icons = { success: 'âœ“', error: 'âœ-', info: 'â„¹', warn: 'âš ' };
     t.innerHTML = `<span style="color:${colors[type]};font-size:18px;font-weight:bold">${icons[type]}</span><span>${msg}</span>`;
     setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
     clearTimeout(t._timer);
@@ -69,7 +69,7 @@ async function loadDashboard() {
             setText('stat-total-releases', s.totalReleases ?? 'â€”');
             setText('stat-active-releases', s.activeReleases ?? 'â€”');
             setText('stat-latest-ver', s.latestVersion || 'â€”');
-            document.getElementById('server-status').textContent = 'â— Hoáº¡t Ä‘á»™ng';
+            document.getElementById('server-status').textContent = 'â- Hoáº¡t Ä‘á»™ng';
             document.getElementById('server-status').style.color = 'var(--accent-green)';
         }
 
@@ -92,7 +92,7 @@ async function loadDashboard() {
             }
         }
     } catch (e) {
-        document.getElementById('server-status').textContent = 'â— Máº¥t káº¿t ná»‘i';
+        document.getElementById('server-status').textContent = 'â- Máº¥t káº¿t ná»‘i';
         document.getElementById('server-status').style.color = 'var(--accent-orange)';
     }
 }
@@ -106,7 +106,7 @@ async function loadReleases() {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Äang táº£iâ€¦</td></tr>`;
     try {
         const res = await fetch(`${ADMIN_API}/releases`, { headers: authHeaders() });
-        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lá»—i táº£i danh sÃ¡ch</td></tr>`; return; }
+        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lá»-i táº£i danh sÃ¡ch</td></tr>`; return; }
         const releases = await res.json();
         if (!releases.length) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">ChÆ°a cÃ³ release nÃ o. Upload file á»Ÿ trÃªn Ä‘á»ƒ báº¯t Ä‘áº§u.</td></tr>`;
@@ -131,7 +131,7 @@ async function loadReleases() {
       </tr>`;
         }).join('');
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lá»—i káº¿t ná»‘i server</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lá»-i káº¿t ná»‘i server</td></tr>`;
     }
 }
 
@@ -140,7 +140,7 @@ async function deleteRelease(id) {
     try {
         const res = await fetch(`${ADMIN_API}/releases/${id}`, { method: 'DELETE', headers: authHeaders() });
         if (res.ok) { showToast('ÄÃ£ xoÃ¡ release!', 'success'); loadReleases(); loadDashboard(); }
-        else showToast('Lá»—i khi xoÃ¡', 'error');
+        else showToast('Lá»-i khi xoÃ¡', 'error');
     } catch { showToast('KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c server', 'error'); }
 }
 
@@ -221,7 +221,7 @@ async function uploadFile(type) {
                 if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
                 else reject(new Error(JSON.parse(xhr.responseText)?.error || 'Upload tháº¥t báº¡i'));
             };
-            xhr.onerror = () => reject(new Error('Lá»—i máº¡ng'));
+            xhr.onerror = () => reject(new Error('Lá»-i máº¡ng'));
             xhr.send(formData);
         });
         showToast(`Upload thÃ nh cÃ´ng! v${version}`, 'success');
@@ -270,7 +270,7 @@ async function saveGuideUrls() {
             body: JSON.stringify({ iosGuideUrl: iosUrl, androidGuideUrl: androidUrl })
         });
         if (res.ok) showToast('ÄÃ£ lÆ°u cÃ i Ä‘áº·t!', 'success');
-        else showToast('Lá»—i khi lÆ°u', 'error');
+        else showToast('Lá»-i khi lÆ°u', 'error');
     } catch { showToast('KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c server', 'error'); }
 }
 
@@ -315,4 +315,3 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock(); setInterval(updateClock, 30000);
     loadDashboard();
 });
-
