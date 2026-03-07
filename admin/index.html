@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Panel — TuPhim Distribution</title>
+    <title>Admin — TuPhim Distribution</title>
     <link rel="stylesheet" href="admin.css" />
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>" />
@@ -15,64 +15,82 @@
     <!-- ===================== SIDEBAR ===================== -->
     <aside class="admin-sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon">🎬</div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="23 7 16 12 23 17 23 7" />
+                <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+            </svg>
             TuPhim Admin
         </div>
 
         <div class="sidebar-section">
             <div class="sidebar-section-label">Tổng quan</div>
             <div class="sidebar-item active" onclick="showPanel('dashboard', this)">
-                <span class="icon">📊</span> Dashboard
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7" />
+                    <rect x="14" y="3" width="7" height="7" />
+                    <rect x="14" y="14" width="7" height="7" />
+                    <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                Dashboard
             </div>
         </div>
 
         <div class="sidebar-section">
             <div class="sidebar-section-label">Quản lý</div>
-            <div class="sidebar-item" onclick="showPanel('devices', this)">
-                <span class="icon">📱</span> Thiết bị (UDID)
-                <span class="sidebar-badge">3</span>
-            </div>
-            <div class="sidebar-item" onclick="showPanel('certs', this)">
-                <span class="icon">🔐</span> Chứng chỉ
-            </div>
             <div class="sidebar-item" onclick="showPanel('releases', this)">
-                <span class="icon">📦</span> Releases
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Upload &amp; Releases
             </div>
-        </div>
-
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Phân tích</div>
-            <div class="sidebar-item" onclick="showPanel('analytics', this)">
-                <span class="icon">📈</span> Analytics
-            </div>
-        </div>
-
-        <div class="sidebar-section">
-            <div class="sidebar-section-label">Hệ thống</div>
             <div class="sidebar-item" onclick="showPanel('settings', this)">
-                <span class="icon">⚙️</span> Cài đặt
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+                </svg>
+                Cài đặt
             </div>
+        </div>
+
+        <div class="sidebar-section" style="margin-top:auto">
             <a href="../" class="sidebar-item">
-                <span class="icon">🌐</span> Xem trang chính
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                Xem trang chính
             </a>
         </div>
 
         <div class="sidebar-footer">
-            TuPhim Distribution v2.1.0<br />
-            <span style="color:var(--accent-green)">● Hệ thống hoạt động</span>
+            TuPhim Distribution<br />
+            <span id="server-status" style="color:var(--accent-green)">● Đang kết nối…</span>
         </div>
     </aside>
 
     <!-- ===================== MAIN ===================== -->
     <main class="admin-main">
         <div class="admin-topbar">
-            <div class="topbar-title" id="topbar-title">📊 Dashboard</div>
+            <div class="topbar-title" id="topbar-title">Dashboard</div>
             <div class="topbar-actions">
-                <span style="font-size:13px;color:var(--text-muted)">06/03/2026 · 21:00 ICT</span>
-                <button class="btn btn-primary" style="font-size:13px"
-                    onclick="showToast('🔄','Dữ liệu đã được làm mới!')">
-                    🔄 Làm mới
+                <span id="topbar-clock" style="font-size:13px;color:var(--text-muted)"></span>
+                <button class="btn btn-outline btn-sm" onclick="refreshData()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10" />
+                        <polyline points="1 20 1 14 7 14" />
+                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                    </svg>
+                    Làm mới
                 </button>
+                <button class="btn btn-danger btn-sm" onclick="logout()">Đăng xuất</button>
             </div>
         </div>
 
@@ -80,363 +98,124 @@
 
             <!-- ==================== PANEL: DASHBOARD ==================== -->
             <div class="panel active" id="panel-dashboard">
-
-                <!-- Alert: pending devices -->
-                <div class="notif warning" style="margin-bottom:20px">
-                    <div class="notif-icon">⚠️</div>
-                    <div class="notif-content">
-                        <div class="notif-title">3 thiết bị đang chờ đăng ký UDID</div>
-                        <div class="notif-body">Cần ký IPA và cập nhật provisioning profile cho các thiết bị mới.</div>
-                    </div>
-                    <button class="btn btn-sm btn-outline" style="margin-left:auto;flex-shrink:0"
-                        onclick="showPanel('devices',document.querySelectorAll('.sidebar-item')[1])">Xem</button>
-                </div>
-
-                <!-- Stat Cards -->
-                <div class="stat-cards">
+                <div class="stat-cards" id="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-card-header">
-                            <div class="stat-card-icon">📲</div>
-                            <span class="stat-card-trend trend-up">↑ 12%</span>
+                            <div class="stat-card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" y1="15" x2="12" y2="3" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="stat-card-value" id="live-installs" data-count="5284">0</div>
-                        <div class="stat-card-label">Tổng lượt cài đặt</div>
+                        <div class="stat-card-value" id="stat-total-releases">—</div>
+                        <div class="stat-card-label">Tổng releases</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-header">
-                            <div class="stat-card-icon">📱</div>
-                            <span class="stat-card-trend trend-up">↑ 5</span>
+                            <div class="stat-card-icon"
+                                style="background:rgba(16,185,129,0.12);color:var(--accent-green)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="stat-card-value" data-count="87">0</div>
-                        <div class="stat-card-label">Thiết bị đã đăng ký</div>
+                        <div class="stat-card-value" id="stat-active-releases">—</div>
+                        <div class="stat-card-label">Releases đang live</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-header">
-                            <div class="stat-card-icon">🔐</div>
-                            <span class="stat-card-trend trend-neutral">2 active</span>
+                            <div class="stat-card-icon"
+                                style="background:rgba(79,142,247,0.12);color:var(--accent-blue)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="stat-card-value">2/3</div>
-                        <div class="stat-card-label">Chứng chỉ hoạt động</div>
+                        <div class="stat-card-value" id="stat-latest-ver">—</div>
+                        <div class="stat-card-label">Phiên bản mới nhất</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-header">
-                            <div class="stat-card-icon">📦</div>
-                            <span class="stat-card-trend trend-up">Mới nhất</span>
+                            <div class="stat-card-icon"
+                                style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="16" y1="2" x2="16" y2="6" />
+                                    <line x1="8" y1="2" x2="8" y2="6" />
+                                    <line x1="3" y1="10" x2="21" y2="10" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="stat-card-value">v2.1.0</div>
-                        <div class="stat-card-label">Phiên bản hiện tại</div>
+                        <div class="stat-card-value" id="stat-last-upload">—</div>
+                        <div class="stat-card-label">Upload gần nhất</div>
                     </div>
                 </div>
 
-                <!-- Recent installs mini chart + activity -->
-                <div class="grid-2">
-                    <div class="analytics-chart">
-                        <div class="chart-title">Cài đặt 7 ngày qua</div>
-                        <div class="bar-chart">
-                            <div class="bar-col">
-                                <div class="bar" data-height="45" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">T2</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="65" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">T3</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="55" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">T4</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="80" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">T5</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="90" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">T6</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="70" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">T7</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="100" style="height:4px;background:rgba(79,142,247,0.3)">
-                                </div>
-                                <div class="bar-label">CN</div>
-                            </div>
-                        </div>
+                <!-- Live releases overview -->
+                <div class="card" style="margin-top:24px">
+                    <div class="card-header">
+                        <div class="card-title">Releases đang live</div>
+                        <button class="btn btn-primary btn-sm"
+                            onclick="showPanel('releases', document.querySelectorAll('.sidebar-item')[1])">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                            </svg>
+                            Upload mới
+                        </button>
                     </div>
-
-                    <div
-                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px">
-                        <div class="chart-title">Hoạt động gần đây</div>
-                        <div style="display:flex;flex-direction:column;gap:10px">
-                            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-                                <span>✅</span>
-                                <div><strong>iPhone 14 Pro</strong> đã cài đặt thành công<br /><span
-                                        style="color:var(--text-muted);font-size:11px">2 phút trước · iOS 17.3</span>
-                                </div>
+                    <div id="dashboard-live-releases" class="platform-status-grid">
+                        <div class="platform-status-item" id="status-ios">
+                            <div class="psi-icon ios">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                                </svg>
                             </div>
-                            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-                                <span>🔑</span>
-                                <div><strong>UDID mới</strong> chờ được đăng ký<br /><span
-                                        style="color:var(--text-muted);font-size:11px">8 phút trước · iPhone 15</span>
-                                </div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-                                <span>📦</span>
-                                <div><strong>v2.1.0</strong> IPA đã được publish<br /><span
-                                        style="color:var(--text-muted);font-size:11px">1 giờ trước</span></div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-                                <span>🤖</span>
-                                <div><strong>APK v2.1.0</strong> upload thành công<br /><span
-                                        style="color:var(--text-muted);font-size:11px">1 giờ trước · 48.2 MB</span>
-                                </div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:10px;font-size:13px">
-                                <span>⚠️</span>
-                                <div><strong>Cert #1</strong> còn 23 slot thiết bị<br /><span
-                                        style="color:var(--text-muted);font-size:11px">Hôm nay · Cân nhắc thêm
-                                        cert</span></div>
+                            <div class="psi-info">
+                                <div class="psi-name">iOS (IPA)</div>
+                                <div class="psi-status" id="psi-ios-status">Kiểm tra…</div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ==================== PANEL: DEVICES ==================== -->
-            <div class="panel" id="panel-devices">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-                    <div>
-                        <h2 style="font-size:18px;font-weight:800">Thiết bị đã đăng ký (UDID)</h2>
-                        <p style="font-size:13px;color:var(--text-muted);margin-top:4px">Tổng 87 thiết bị · 3 đang chờ
-                            xử lý</p>
-                    </div>
-                    <div style="display:flex;gap:10px">
-                        <div class="search-input-wrap">
-                            <span class="search-icon">🔍</span>
-                            <input type="text" class="form-input" placeholder="Tìm UDID, tên thiết bị…"
-                                style="width:240px;padding-left:36px" />
-                        </div>
-                        <button class="btn btn-primary" onclick="showToast('📥','Đã xuất danh sách CSV!')">⬇️ Xuất
-                            CSV</button>
-                    </div>
-                </div>
-
-                <!-- Pending devices -->
-                <div class="notif warning" style="margin-bottom:16px">
-                    <div class="notif-icon">⏳</div>
-                    <div class="notif-content">
-                        <div class="notif-title">3 thiết bị chờ ký IPA</div>
-                        <div class="notif-body">Bấm "Ký IPA" để ký riêng cho từng thiết bị và cung cấp link cài.</div>
-                    </div>
-                    <button class="btn btn-sm btn-primary" style="margin-left:auto;flex-shrink:0"
-                        onclick="signIPA('tất cả cert')">Ký tất cả</button>
-                </div>
-
-                <div class="admin-table-wrap">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Thiết bị</th>
-                                <th>UDID</th>
-                                <th>Chứng chỉ</th>
-                                <th>Trạng thái</th>
-                                <th>Ngày ĐK</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr data-udid="a1b2c3-pending1">
-                                <td>
-                                    <div style="font-weight:600">iPhone 15 Pro</div>
-                                    <div style="font-size:11px;color:var(--text-muted)">iOS 17.4</div>
-                                </td>
-                                <td class="td-mono">00008110-000A1B2C3D4E5F6A</td>
-                                <td>—</td>
-                                <td><span class="badge badge-orange"><span class="badge-dot"></span>Chờ ký</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">06/03/2026</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success" onclick="signIPA('Cert #1')">✍️ Ký
-                                        IPA</button>
-                                </td>
-                            </tr>
-                            <tr data-udid="a1b2c3-pending2">
-                                <td>
-                                    <div style="font-weight:600">iPhone 14</div>
-                                    <div style="font-size:11px;color:var(--text-muted)">iOS 17.2</div>
-                                </td>
-                                <td class="td-mono">00008110-000B2C3D4E5F6A7B</td>
-                                <td>—</td>
-                                <td><span class="badge badge-orange"><span class="badge-dot"></span>Chờ ký</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">06/03/2026</td>
-                                <td>
-                                    <button class="btn btn-sm btn-success" onclick="signIPA('Cert #1')">✍️ Ký
-                                        IPA</button>
-                                </td>
-                            </tr>
-                            <tr data-udid="a1b2c3-active1">
-                                <td>
-                                    <div style="font-weight:600">iPhone 13 Pro Max</div>
-                                    <div style="font-size:11px;color:var(--text-muted)">iOS 16.7</div>
-                                </td>
-                                <td class="td-mono">00008110-000C3D4E5F6A7B8C</td>
-                                <td><span class="badge badge-blue">Cert #1</span></td>
-                                <td><span class="badge badge-green"><span class="badge-dot"></span>Đã cài</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">02/03/2026</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteDevice('a1b2c3-active1')">🗑️
-                                        Xoá</button>
-                                </td>
-                            </tr>
-                            <tr data-udid="a1b2c3-active2">
-                                <td>
-                                    <div style="font-weight:600">iPad Air 5</div>
-                                    <div style="font-size:11px;color:var(--text-muted)">iPadOS 17.3</div>
-                                </td>
-                                <td class="td-mono">00008112-000D4E5F6A7B8C9D</td>
-                                <td><span class="badge badge-blue">Cert #1</span></td>
-                                <td><span class="badge badge-green"><span class="badge-dot"></span>Đã cài</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">28/02/2026</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteDevice('a1b2c3-active2')">🗑️
-                                        Xoá</button>
-                                </td>
-                            </tr>
-                            <tr data-udid="a1b2c3-active3">
-                                <td>
-                                    <div style="font-weight:600">iPhone 12</div>
-                                    <div style="font-size:11px;color:var(--text-muted)">iOS 15.8</div>
-                                </td>
-                                <td class="td-mono">00008101-000E5F6A7B8C9D0E</td>
-                                <td><span class="badge badge-purple">Cert #2</span></td>
-                                <td><span class="badge badge-green"><span class="badge-dot"></span>Đã cài</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">20/02/2026</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteDevice('a1b2c3-active3')">🗑️
-                                        Xoá</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ==================== PANEL: CERTIFICATES ==================== -->
-            <div class="panel" id="panel-certs">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-                    <div>
-                        <h2 style="font-size:18px;font-weight:800">Chứng chỉ & Provisioning Profiles</h2>
-                        <p style="font-size:13px;color:var(--text-muted);margin-top:4px">Quản lý cert.p12 và
-                            cert.mobileprovision</p>
-                    </div>
-                    <button class="btn btn-primary" onclick="showToast('➕','Chức năng thêm cert sẽ mở form upload!')">➕
-                        Thêm chứng chỉ</button>
-                </div>
-
-                <div class="notif info" style="margin-bottom:20px">
-                    <div class="notif-icon">📂</div>
-                    <div class="notif-content">
-                        <div class="notif-title">Chứng chỉ đang dùng: cert.p12 + cert.mobileprovision</div>
-                        <div class="notif-body">File chứng chỉ có sẵn được load từ thư mục /certificate/ trên server.
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cert Card 1 -->
-                <div class="cert-card">
-                    <div class="cert-card-header">
-                        <div>
-                            <div class="cert-name">🔐 Chứng chỉ Chính (cert.p12)</div>
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Fingerprint:
-                                A1:B2:C3:D4:E5:F6…</div>
-                        </div>
-                        <div style="display:flex;gap:8px;align-items:center">
-                            <span class="badge badge-green"><span class="badge-dot"></span>Hoạt động</span>
-                            <button class="btn btn-sm btn-outline" onclick="renewCert('cert.p12')">🔄 Gia hạn</button>
-                            <button class="btn btn-sm btn-danger" onclick="revokeCert('cert.p12')">⛔ Thu hồi</button>
-                        </div>
-                    </div>
-                    <div class="cert-meta">
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Loại</div>
-                            <div class="cert-meta-value">Personal Certificate (P12)</div>
-                        </div>
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Hết hạn</div>
-                            <div class="cert-meta-value" style="color:var(--accent-orange)">⚠️ 15/08/2026 (~5 tháng)
+                        <div class="platform-status-item" id="status-android">
+                            <div class="psi-icon android">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+                                </svg>
+                            </div>
+                            <div class="psi-info">
+                                <div class="psi-name">Android (APK)</div>
+                                <div class="psi-status" id="psi-android-status">Kiểm tra…</div>
                             </div>
                         </div>
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Provisioning Profile</div>
-                            <div class="cert-meta-value">cert.mobileprovision ✅</div>
-                        </div>
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Bundle ID</div>
-                            <div class="cert-meta-value" style="font-family:monospace;font-size:13px">com.tophim.app
+                        <div class="platform-status-item" id="status-windows">
+                            <div class="psi-icon windows">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+                                </svg>
                             </div>
-                        </div>
-                    </div>
-                    <div class="capacity-bar">
-                        <div class="capacity-bar-label">
-                            <span>Thiết bị đã dùng</span>
-                            <span style="font-weight:700">77 / 100 thiết bị <span
-                                    style="color:var(--accent-orange)">(77%)</span></span>
-                        </div>
-                        <div class="capacity-track">
-                            <div class="capacity-fill warning" style="width:77%"></div>
-                        </div>
-                    </div>
-                    <div style="display:flex;gap:8px;margin-top:14px">
-                        <button class="btn btn-sm btn-primary" onclick="signIPA('cert.p12')">✍️ Ký IPA ngay</button>
-                        <button class="btn btn-sm btn-outline" onclick="showToast('📄','Tải cert.mobileprovision…')">📄
-                            Xem Profile</button>
-                    </div>
-                </div>
-
-                <!-- Cert Card 2 -->
-                <div class="cert-card">
-                    <div class="cert-card-header">
-                        <div>
-                            <div class="cert-name">🔐 Chứng chỉ Legacy (cert_legacy.p12)</div>
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Fingerprint:
-                                F6:E5:D4:C3:B2:A1…</div>
-                        </div>
-                        <div style="display:flex;gap:8px;align-items:center">
-                            <span class="badge badge-purple">Dự phòng</span>
-                            <button class="btn btn-sm btn-success"
-                                onclick="showToast('✅','Cert legacy đã được kích hoạt!')">▶️ Kích hoạt</button>
-                        </div>
-                    </div>
-                    <div class="cert-meta">
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Loại</div>
-                            <div class="cert-meta-value">Personal Certificate (Legacy)</div>
-                        </div>
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Hết hạn</div>
-                            <div class="cert-meta-value" style="color:var(--accent-green)">✅ 10/01/2027 (~10 tháng)
+                            <div class="psi-info">
+                                <div class="psi-name">Windows (EXE)</div>
+                                <div class="psi-status" id="psi-windows-status">Kiểm tra…</div>
                             </div>
-                        </div>
-                        <div class="cert-meta-item">
-                            <div class="cert-meta-label">Trạng thái</div>
-                            <div class="cert-meta-value" style="color:var(--text-muted)">Standby — chưa có provisioning
-                            </div>
-                        </div>
-                    </div>
-                    <div class="capacity-bar">
-                        <div class="capacity-bar-label">
-                            <span>Thiết bị đã dùng</span>
-                            <span style="font-weight:700">10 / 100 thiết bị <span
-                                    style="color:var(--accent-green)">(10%)</span></span>
-                        </div>
-                        <div class="capacity-track">
-                            <div class="capacity-fill" style="width:10%"></div>
                         </div>
                     </div>
                 </div>
@@ -444,452 +223,286 @@
 
             <!-- ==================== PANEL: RELEASES ==================== -->
             <div class="panel" id="panel-releases">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div class="page-header">
                     <div>
-                        <h2 style="font-size:18px;font-weight:800">Releases & Upload</h2>
-                        <p style="font-size:13px;color:var(--text-muted);margin-top:4px">Quản lý IPA, APK và Windows
-                            installer</p>
+                        <h2>Upload &amp; Releases</h2>
+                        <p>Quản lý IPA, APK và Windows installer</p>
                     </div>
                 </div>
 
-                <div class="grid-2" style="margin-bottom:24px">
-                    <!-- Upload IPA -->
-                    <div
-                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px">
-                        <div style="font-size:15px;font-weight:700;margin-bottom:16px">📱 Upload IPA (iOS)</div>
-                        <div class="upload-area" id="upload-area-ipa">
-                            <input type="file" accept=".ipa" id="upload-input-ipa" style="display:none">
-                            <div class="upload-icon">📱</div>
-                            <h3>Kéo thả hoặc bấm để chọn IPA</h3>
-                            <p>Hỗ trợ file .ipa · Tối đa 500MB</p>
-                        </div>
-                        <div class="upload-progress" id="upload-progress-ipa">
-                            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-                                <span>Đang upload…</span><span id="ipa-pct">0%</span>
+                <!-- Upload Cards -->
+                <div class="upload-grid">
+                    <!-- IPA Upload -->
+                    <div class="card upload-card">
+                        <div class="upload-card-header">
+                            <div class="upload-platform-icon ios">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                                </svg>
                             </div>
-                            <div class="progress-track">
-                                <div class="progress-bar-fill"></div>
+                            <div>
+                                <div class="upload-card-title">iOS — Upload IPA</div>
+                                <div class="upload-card-sub">File .ipa · Tối đa 500MB</div>
                             </div>
                         </div>
-                        <div style="display:flex;gap:10px;margin-top:14px">
-                            <div class="form-group" style="flex:1;margin:0">
-                                <input class="form-input" placeholder="Phiên bản (vd: 2.1.0)" />
-                            </div>
-                            <button class="btn btn-primary" onclick="signIPA('cert.p12')">✍️ Ký & Publish</button>
+                        <div class="upload-dropzone" id="drop-ipa"
+                            onclick="document.getElementById('file-ipa').click()">
+                            <input type="file" id="file-ipa" accept=".ipa" style="display:none"
+                                onchange="handleFile(this,'ipa')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" style="color:var(--text-muted);margin-bottom:10px">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <div class="dz-text">Kéo thả file <strong>.ipa</strong> vào đây</div>
+                            <div class="dz-sub">hoặc bấm để chọn file</div>
                         </div>
+                        <div class="upload-progress" id="prog-ipa" style="display:none">
+                            <div class="prog-header"><span id="prog-ipa-name">Uploading…</span><span
+                                    id="prog-ipa-pct">0%</span></div>
+                            <div class="prog-track">
+                                <div class="prog-fill" id="prog-ipa-fill"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1">
+                                <label class="form-label">Phiên bản</label>
+                                <input class="form-input" id="ver-ipa" placeholder="ví dụ: 2.1.0" />
+                            </div>
+                            <label class="toggle-wrap">
+                                <input type="checkbox" id="active-ipa" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Set live</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" id="btn-upload-ipa" onclick="uploadFile('ipa')" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Upload IPA
+                        </button>
                     </div>
 
-                    <!-- Upload APK / Windows -->
-                    <div
-                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px">
-                        <div style="font-size:15px;font-weight:700;margin-bottom:16px">🤖 Upload APK / 🪟 Windows</div>
-                        <div class="upload-area" id="upload-area-provision">
-                            <input type="file" accept=".apk,.exe,.msix" id="upload-input-provision"
-                                style="display:none">
-                            <div class="upload-icon">📦</div>
-                            <h3>Kéo thả APK, EXE hoặc MSIX</h3>
-                            <p>.apk · .exe · .msix · Tối đa 500MB</p>
-                        </div>
-                        <div class="upload-progress" id="upload-progress-provision">
-                            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-                                <span>Đang upload…</span>
+                    <!-- APK Upload -->
+                    <div class="card upload-card">
+                        <div class="upload-card-header">
+                            <div class="upload-platform-icon android">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+                                </svg>
                             </div>
-                            <div class="progress-track">
-                                <div class="progress-bar-fill"></div>
+                            <div>
+                                <div class="upload-card-title">Android — Upload APK</div>
+                                <div class="upload-card-sub">File .apk · Tối đa 500MB</div>
                             </div>
                         </div>
-                        <div style="display:flex;gap:10px;margin-top:14px">
-                            <div class="form-group" style="flex:1;margin:0">
-                                <input class="form-input" placeholder="Phiên bản (vd: 2.1.0)" />
-                            </div>
-                            <button class="btn btn-primary" onclick="showToast('📤','Đang publish release…')">📤
-                                Publish</button>
+                        <div class="upload-dropzone" id="drop-apk"
+                            onclick="document.getElementById('file-apk').click()">
+                            <input type="file" id="file-apk" accept=".apk" style="display:none"
+                                onchange="handleFile(this,'apk')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" style="color:var(--text-muted);margin-bottom:10px">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <div class="dz-text">Kéo thả file <strong>.apk</strong> vào đây</div>
+                            <div class="dz-sub">hoặc bấm để chọn file</div>
                         </div>
+                        <div class="upload-progress" id="prog-apk" style="display:none">
+                            <div class="prog-header"><span id="prog-apk-name">Uploading…</span><span
+                                    id="prog-apk-pct">0%</span></div>
+                            <div class="prog-track">
+                                <div class="prog-fill" id="prog-apk-fill"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1">
+                                <label class="form-label">Phiên bản</label>
+                                <input class="form-input" id="ver-apk" placeholder="ví dụ: 2.1.0" />
+                            </div>
+                            <label class="toggle-wrap">
+                                <input type="checkbox" id="active-apk" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Set live</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-android" id="btn-upload-apk" onclick="uploadFile('apk')" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Upload APK
+                        </button>
+                    </div>
+
+                    <!-- Windows Upload -->
+                    <div class="card upload-card">
+                        <div class="upload-card-header">
+                            <div class="upload-platform-icon windows">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="upload-card-title">Windows — Upload EXE</div>
+                                <div class="upload-card-sub">File .exe / .msix · Tối đa 500MB</div>
+                            </div>
+                        </div>
+                        <div class="upload-dropzone" id="drop-win"
+                            onclick="document.getElementById('file-win').click()">
+                            <input type="file" id="file-win" accept=".exe,.msix" style="display:none"
+                                onchange="handleFile(this,'win')">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" style="color:var(--text-muted);margin-bottom:10px">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            <div class="dz-text">Kéo thả file <strong>.exe</strong> vào đây</div>
+                            <div class="dz-sub">hoặc bấm để chọn file</div>
+                        </div>
+                        <div class="upload-progress" id="prog-win" style="display:none">
+                            <div class="prog-header"><span id="prog-win-name">Uploading…</span><span
+                                    id="prog-win-pct">0%</span></div>
+                            <div class="prog-track">
+                                <div class="prog-fill" id="prog-win-fill"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1">
+                                <label class="form-label">Phiên bản</label>
+                                <input class="form-input" id="ver-win" placeholder="ví dụ: 2.1.0" />
+                            </div>
+                            <label class="toggle-wrap">
+                                <input type="checkbox" id="active-win" checked>
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-label">Set live</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-windows" id="btn-upload-win" onclick="uploadFile('win')" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Upload EXE
+                        </button>
                     </div>
                 </div>
 
                 <!-- Release History -->
-                <div class="admin-table-wrap">
-                    <div class="table-header">
-                        <div class="table-title">Lịch sử Releases</div>
+                <div class="card" style="margin-top:28px">
+                    <div class="card-header">
+                        <div class="card-title">Lịch sử Releases</div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Phiên bản</th>
-                                <th>Nền tảng</th>
-                                <th>Kích thước</th>
-                                <th>Chứng chỉ</th>
-                                <th>Trạng thái</th>
-                                <th>Ngày</th>
-                                <th>Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>v2.1.0</strong> <span
-                                        style="font-size:11px;color:var(--accent-blue);margin-left:4px">LATEST</span>
-                                </td>
-                                <td><span class="badge badge-blue">🍎 iOS</span></td>
-                                <td style="color:var(--text-secondary);font-size:13px">124.8 MB</td>
-                                <td><span class="badge badge-blue">cert.p12</span></td>
-                                <td><span class="badge badge-green"><span class="badge-dot"></span>Live</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">06/03/2026</td>
-                                <td><button class="btn btn-sm btn-outline" onclick="showToast('🔗','Link đã copy!')">🔗
-                                        Copy link</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>v2.1.0</strong></td>
-                                <td><span class="badge badge-green">🤖 Android</span></td>
-                                <td style="color:var(--text-secondary);font-size:13px">48.2 MB</td>
-                                <td>—</td>
-                                <td><span class="badge badge-green"><span class="badge-dot"></span>Live</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">06/03/2026</td>
-                                <td><button class="btn btn-sm btn-outline" onclick="showToast('🔗','Link đã copy!')">🔗
-                                        Copy link</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>v2.0.5</strong></td>
-                                <td><span class="badge badge-blue">🍎 iOS</span></td>
-                                <td style="color:var(--text-secondary);font-size:13px">121.3 MB</td>
-                                <td><span class="badge badge-blue">cert.p12</span></td>
-                                <td><span class="badge badge-orange">Cũ</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">01/03/2026</td>
-                                <td><button class="btn btn-sm btn-danger"
-                                        onclick="showToast('🗑️','Release cũ đã xoá!')">🗑️ Xoá</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>v2.0.5</strong></td>
-                                <td><span class="badge badge-green">🤖 Android</span></td>
-                                <td style="color:var(--text-secondary);font-size:13px">46.1 MB</td>
-                                <td>—</td>
-                                <td><span class="badge badge-orange">Cũ</span></td>
-                                <td style="font-size:12px;color:var(--text-secondary)">01/03/2026</td>
-                                <td><button class="btn btn-sm btn-danger"
-                                        onclick="showToast('🗑️','Release cũ đã xoá!')">🗑️ Xoá</button></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ==================== PANEL: ANALYTICS ==================== -->
-            <div class="panel" id="panel-analytics">
-                <h2 style="font-size:18px;font-weight:800;margin-bottom:20px">📈 Analytics</h2>
-
-                <div class="stat-cards" style="margin-bottom:24px">
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon">📲</div><span class="stat-card-trend trend-up">↑ 18%</span>
-                        </div>
-                        <div class="stat-card-value" data-count="5284">0</div>
-                        <div class="stat-card-label">Tổng cài đặt</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon">🍎</div><span class="stat-card-trend trend-up">↑ 24%</span>
-                        </div>
-                        <div class="stat-card-value" data-count="3621">0</div>
-                        <div class="stat-card-label">iOS Installs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon">🤖</div><span class="stat-card-trend trend-up">↑ 9%</span>
-                        </div>
-                        <div class="stat-card-value" data-count="1512">0</div>
-                        <div class="stat-card-label">Android Installs</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-card-header">
-                            <div class="stat-card-icon">🪟</div><span class="stat-card-trend trend-neutral">Ổn
-                                định</span>
-                        </div>
-                        <div class="stat-card-value" data-count="151">0</div>
-                        <div class="stat-card-label">Windows Installs</div>
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <!-- Bar chart 30 days -->
-                    <div class="analytics-chart">
-                        <div class="chart-title">Cài đặt 30 ngày (iOS + Android)</div>
-                        <div class="bar-chart" style="height:140px">
-                            <div class="bar-col">
-                                <div class="bar" data-height="30" style="height:4px"></div>
-                                <div class="bar-label">T2</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="45" style="height:4px"></div>
-                                <div class="bar-label">T3</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="38" style="height:4px"></div>
-                                <div class="bar-label">T4</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="60" style="height:4px"></div>
-                                <div class="bar-label">T5</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="75" style="height:4px"></div>
-                                <div class="bar-label">T6</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="55" style="height:4px"></div>
-                                <div class="bar-label">T7</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="90" style="height:4px"></div>
-                                <div class="bar-label">CN</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="40" style="height:4px"></div>
-                                <div class="bar-label">T2</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="65" style="height:4px"></div>
-                                <div class="bar-label">T3</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="80" style="height:4px"></div>
-                                <div class="bar-label">T4</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="70" style="height:4px"></div>
-                                <div class="bar-label">T5</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="95" style="height:4px"></div>
-                                <div class="bar-label">T6</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="85" style="height:4px"></div>
-                                <div class="bar-label">T7</div>
-                            </div>
-                            <div class="bar-col">
-                                <div class="bar" data-height="100" style="height:4px"></div>
-                                <div class="bar-label">CN</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Donut chart platform distribution -->
-                    <div class="analytics-chart">
-                        <div class="chart-title">Phân phối theo nền tảng</div>
-                        <div class="ring-chart-wrap">
-                            <div class="ring">
-                                <svg viewBox="0 0 100 100" width="100" height="100">
-                                    <circle class="ring-track" cx="50" cy="50" r="38" />
-                                    <circle class="ring-fill" cx="50" cy="50" r="38" data-pct="69"
-                                        stroke="url(#grad-ios)" stroke-dasharray="0" stroke-dashoffset="0" />
-                                    <defs>
-                                        <linearGradient id="grad-ios" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stop-color="#4f8ef7" />
-                                            <stop offset="100%" stop-color="#22d3ee" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                                <div class="ring-label">
-                                    <span>69%</span>
-                                    <span class="ring-sublabel">iOS</span>
-                                </div>
-                            </div>
-                            <div class="ring-legend">
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--accent-blue)"></div><span>🍎 iOS —
-                                        3,621 (69%)</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--accent-green)"></div><span>🤖
-                                        Android — 1,512 (28%)</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--accent-cyan)"></div><span>🪟 Windows
-                                        — 151 (3%)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- iOS Version breakdown -->
-                <div class="analytics-chart">
-                    <div class="chart-title">Phiên bản iOS phổ biến</div>
-                    <div style="display:flex;flex-direction:column;gap:10px">
-                        <div style="display:flex;align-items:center;gap:12px;font-size:13px">
-                            <span style="width:60px;color:var(--text-secondary)">iOS 17</span>
-                            <div
-                                style="flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:9999px;overflow:hidden">
-                                <div style="height:100%;width:58%;background:var(--grad-main);border-radius:9999px">
-                                </div>
-                            </div>
-                            <span style="width:40px;text-align:right;font-weight:600">58%</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;font-size:13px">
-                            <span style="width:60px;color:var(--text-secondary)">iOS 16</span>
-                            <div
-                                style="flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:9999px;overflow:hidden">
-                                <div style="height:100%;width:29%;background:var(--grad-ios);border-radius:9999px">
-                                </div>
-                            </div>
-                            <span style="width:40px;text-align:right;font-weight:600">29%</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;font-size:13px">
-                            <span style="width:60px;color:var(--text-secondary)">iOS 15</span>
-                            <div
-                                style="flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:9999px;overflow:hidden">
-                                <div style="height:100%;width:10%;background:rgba(79,142,247,0.5);border-radius:9999px">
-                                </div>
-                            </div>
-                            <span style="width:40px;text-align:right;font-weight:600">10%</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:12px;font-size:13px">
-                            <span style="width:60px;color:var(--text-secondary)">iOS 14</span>
-                            <div
-                                style="flex:1;height:8px;background:rgba(255,255,255,0.08);border-radius:9999px;overflow:hidden">
-                                <div style="height:100%;width:3%;background:rgba(79,142,247,0.3);border-radius:9999px">
-                                </div>
-                            </div>
-                            <span style="width:40px;text-align:right;font-weight:600">3%</span>
-                        </div>
+                    <div class="admin-table-wrap">
+                        <table id="releases-table">
+                            <thead>
+                                <tr>
+                                    <th>Nền tảng</th>
+                                    <th>Phiên bản</th>
+                                    <th>Kích thước</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày upload</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="releases-tbody">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Đang
+                                        tải…</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
 
             <!-- ==================== PANEL: SETTINGS ==================== -->
             <div class="panel" id="panel-settings">
-                <h2 style="font-size:18px;font-weight:800;margin-bottom:20px">⚙️ Cài đặt hệ thống</h2>
-
-                <div class="grid-2">
-                    <!-- App Info -->
-                    <div
-                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px">
-                        <div style="font-size:15px;font-weight:700;margin-bottom:16px">📦 Thông tin ứng dụng</div>
-                        <div class="form-group">
-                            <label class="form-label">Tên ứng dụng</label>
-                            <input class="form-input" value="TuPhim" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Bundle ID (iOS)</label>
-                            <input class="form-input" value="com.tophim.app" style="font-family:monospace" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Phiên bản tối thiểu bắt buộc</label>
-                            <input class="form-input" value="2.0.0" />
-                        </div>
-                        <div class="form-group" style="margin-bottom:0">
-                            <label class="form-label">Thông báo force update</label>
-                            <input class="form-input" value="Vui lòng cập nhật lên phiên bản mới nhất!" />
-                        </div>
+                <div class="page-header">
+                    <div>
+                        <h2>Cài đặt</h2>
+                        <p>Cấu hình link hướng dẫn và thông tin ứng dụng</p>
                     </div>
+                </div>
 
+                <div class="settings-grid">
                     <!-- Guide URLs -->
-                    <div style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px"
-                        id="guide-url-card">
-                        <div style="font-size:15px;font-weight:700;margin-bottom:6px">🔗 Link hướng dẫn cài đặt</div>
-                        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-                            Link này sẽ xuất hiện dưới nút "Tải IPA" / "Tải APK" trong modal download của trang chính.
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">🍎 iOS — Link hướng dẫn cài IPA</label>
-                            <input class="form-input" id="input-ios-guide" placeholder="https://..."
-                                style="font-family:monospace;font-size:13px" />
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
-                                Ví dụ: link bài viết hướng dẫn Sideloadly, AltStore, TrollStore…
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                                </svg>
+                                Link hướng dẫn cài đặt
                             </div>
                         </div>
+                        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Link này hiển thị trong nút
+                            "Hướng dẫn cài đặt" trên trang chính.</p>
                         <div class="form-group">
-                            <label class="form-label">🤖 Android — Link hướng dẫn cài APK</label>
-                            <input class="form-input" id="input-android-guide" placeholder="https://..."
-                                style="font-family:monospace;font-size:13px" />
-                            <div style="font-size:12px;color:var(--text-muted);margin-top:6px">
-                                Ví dụ: link bài viết hướng dẫn bật nguồn không xác định…
-                            </div>
+                            <label class="form-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+                                </svg>
+                                iOS — Link hướng dẫn
+                            </label>
+                            <input class="form-input mono" id="input-ios-guide" placeholder="https://..." />
+                            <div class="form-hint">Ví dụ: hướng dẫn Sideloadly, AltStore, TrollStore…</div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
+                                    fill="currentColor">
+                                    <path
+                                        d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+                                </svg>
+                                Android — Link hướng dẫn
+                            </label>
+                            <input class="form-input mono" id="input-android-guide" placeholder="https://..." />
+                            <div class="form-hint">Ví dụ: hướng dẫn bật nguồn không xác định…</div>
                         </div>
                         <button class="btn btn-primary" onclick="saveGuideUrls()"
                             style="width:100%;justify-content:center">
-                            💾 Lưu cài đặt hướng dẫn
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                                <polyline points="17 21 17 13 7 13 7 21" />
+                                <polyline points="7 3 7 8 15 8" />
+                            </svg>
+                            Lưu cài đặt
                         </button>
                     </div>
-
-                    <!-- System Settings -->
-                    <div
-                        style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px">
-                        <div style="font-size:15px;font-weight:700;margin-bottom:16px">⚙️ Cài đặt hệ thống</div>
-                        <div style="display:flex;flex-direction:column;gap:16px">
-                            <div style="display:flex;align-items:center;justify-content:space-between">
-                                <div>
-                                    <div style="font-size:14px;font-weight:600">Force Update</div>
-                                    <div style="font-size:12px;color:var(--text-muted)">Bắt buộc cập nhật phiên bản cũ
-                                    </div>
-                                </div>
-                                <label class="toggle"><input type="checkbox" checked><span
-                                        class="toggle-slider"></span></label>
-                            </div>
-                            <div style="display:flex;align-items:center;justify-content:space-between">
-                                <div>
-                                    <div style="font-size:14px;font-weight:600">UDID Auto-Sign</div>
-                                    <div style="font-size:12px;color:var(--text-muted)">Tự động ký IPA khi nhận UDID mới
-                                    </div>
-                                </div>
-                                <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
-                            </div>
-                            <div style="display:flex;align-items:center;justify-content:space-between">
-                                <div>
-                                    <div style="font-size:14px;font-weight:600">Analytics</div>
-                                    <div style="font-size:12px;color:var(--text-muted)">Thu thập thống kê cài đặt</div>
-                                </div>
-                                <label class="toggle"><input type="checkbox" checked><span
-                                        class="toggle-slider"></span></label>
-                            </div>
-                            <div style="display:flex;align-items:center;justify-content:space-between">
-                                <div>
-                                    <div style="font-size:14px;font-weight:600">Link hết hạn sau</div>
-                                    <div style="font-size:12px;color:var(--text-muted)">Thời gian link cài đặt có hiệu
-                                        lực</div>
-                                </div>
-                                <select class="form-select" style="width:120px">
-                                    <option>24 giờ</option>
-                                    <option>48 giờ</option>
-                                    <option selected>7 ngày</option>
-                                    <option>Không hạn</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Server Config -->
-                <div
-                    style="background:var(--bg-card);border:1px solid var(--glass-border);border-radius:var(--radius-lg);padding:22px;margin-bottom:20px">
-                    <div style="font-size:15px;font-weight:700;margin-bottom:16px">🌐 Cấu hình Server & CDN</div>
-                    <div class="grid-2">
-                        <div class="form-group">
-                            <label class="form-label">API Base URL</label>
-                            <input class="form-input" value="https://api.yourdomain.com" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">CDN URL (IPA Storage)</label>
-                            <input class="form-input" value="https://cdn.yourdomain.com" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">UDID Callback URL</label>
-                            <input class="form-input" value="https://api.yourdomain.com/udid/callback"
-                                style="font-family:monospace;font-size:12px" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Manifest URL Template</label>
-                            <input class="form-input" value="https://cdn.yourdomain.com/manifest/{session}.plist"
-                                style="font-family:monospace;font-size:12px" />
-                        </div>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" onclick="showToast('✅','Cài đặt đã được lưu thành công!')">💾 Lưu tất
-                    cả</button>
             </div>
 
-        </div><!-- /admin-content -->
+        </div><!-- .admin-content -->
     </main>
 
     <script src="admin.js"></script>

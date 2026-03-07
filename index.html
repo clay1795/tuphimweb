@@ -17,17 +17,40 @@
 
   <!-- ==================== NAVBAR ==================== -->
   <nav class="navbar">
-    <div class="navbar-brand">
+    <a href="/" class="navbar-brand">
       <img src="assets/logo.png" alt="TuPhim" />
-      TuPhim
-    </div>
+      <span>TuPhim</span>
+    </a>
     <div class="navbar-links">
       <a href="#download">Tải xuống</a>
       <a href="#features">Tính năng</a>
       <a href="#faq">FAQ</a>
     </div>
-    <button class="navbar-cta" id="btn-nav-download">Tải ngay</button>
+    <button class="btn btn-primary btn-sm navbar-cta" id="btn-nav-download">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+      Tải ngay
+    </button>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
   </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#download" onclick="closeMobileMenu()">Tải xuống</a>
+    <a href="#features" onclick="closeMobileMenu()">Tính năng</a>
+    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
+  </div>
 
   <!-- ==================== HERO ==================== -->
   <section class="hero">
@@ -50,103 +73,185 @@
       Cài đặt dễ dàng trên iPhone, Android và Windows — hoàn toàn miễn phí.
     </p>
 
-    <div class="hero-version">
-      <span>📦 <span id="hero-ver">v2.1.0</span></span>
-      <span style="color:var(--glass-border)">·</span>
-      <span>🗓️ <span id="hero-date">07/03/2026</span></span>
+    <div class="hero-meta">
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+        </svg>
+        <span id="hero-ver">v2.1.0</span>
+      </span>
+      <span class="sep">·</span>
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span id="hero-date">07/03/2026</span>
+      </span>
     </div>
 
     <div class="hero-actions">
       <button class="btn btn-primary btn-lg" id="btn-main-download">
-        <span>⬇️</span> Tải ứng dụng
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Tải ứng dụng
       </button>
-      <a href="#features" class="btn btn-outline btn-lg">Tìm hiểu thêm</a>
+      <a href="#features" class="btn btn-outline btn-lg">
+        Tìm hiểu thêm
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </a>
     </div>
 
     <div class="hero-platforms">
-      <div class="hero-platforms-icons">
-        <div class="hero-platform-dot">🍎</div>
-        <div class="hero-platform-dot">🤖</div>
-        <div class="hero-platform-dot">🪟</div>
+      <div class="platform-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+        </svg>
+        iOS
       </div>
-      Hỗ trợ iOS · Android · Windows
+      <div class="platform-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+        </svg>
+        Android
+      </div>
+      <div class="platform-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+        </svg>
+        Windows
+      </div>
     </div>
   </section>
 
   <!-- ==================== STATS ==================== -->
-  <div class="stats-bar"
-    style="position:relative;z-index:1;margin-bottom:80px;padding:0 24px;max-width:720px;margin-left:auto;margin-right:auto">
-    <div class="stat-item">
-      <div class="stat-value blue" data-count="5280" data-suffix="+">0</div>
-      <div class="stat-label">Lượt tải về</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value green" data-count="12500" data-suffix="+">0</div>
-      <div class="stat-label">Phim &amp; Series</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value purple" data-count="98" data-suffix="%">0</div>
-      <div class="stat-label">Hài lòng</div>
+  <div class="stats-wrap">
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value blue" data-count="5280" data-suffix="+">0</div>
+        <div class="stat-label">Lượt tải về</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value green" data-count="12500" data-suffix="+">0</div>
+        <div class="stat-label">Phim &amp; Series</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value purple" data-count="98" data-suffix="%">0</div>
+        <div class="stat-label">Hài lòng</div>
+      </div>
     </div>
   </div>
 
   <!-- ==================== DOWNLOAD ==================== -->
   <section class="section" id="download">
-    <div style="text-align:center;margin-bottom:52px">
-      <div class="section-label">📥 Tải xuống</div>
+    <div class="section-header">
+      <div class="section-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7 10 12 15 17 10" />
+          <line x1="12" y1="15" x2="12" y2="3" />
+        </svg>
+        Tải xuống
+      </div>
       <h2 class="section-title">Chọn nền tảng của bạn</h2>
       <p class="section-sub">Hỗ trợ đầy đủ iOS, Android và Windows</p>
     </div>
     <div class="platforms-grid">
 
       <!-- iOS -->
-      <div class="platform-card ios" id="card-ios">
-        <div class="platform-card-icon ios">🍎</div>
+      <div class="platform-card ios">
+        <div class="platform-card-icon ios">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+          </svg>
+        </div>
         <div class="platform-card-name">iPhone / iPad</div>
         <div class="platform-card-desc">
-          Tải file IPA và cài đặt dễ dàng. Có hướng dẫn chi tiết từng bước.
-          Tương thích iOS 14.0 trở lên.
+          Tải file IPA và cài đặt dễ dàng theo hướng dẫn chi tiết. Tương thích iOS 14.0 trở lên.
         </div>
         <div class="platform-tags">
           <span class="ptag ptag-blue">iOS 14.0+</span>
-          <span class="ptag ptag-cyan">IPA</span>
+          <span class="ptag ptag-cyan">File IPA</span>
         </div>
         <button class="btn btn-ios btn-full" onclick="openModal('modal-ios')">
-          <span>🍎</span> Tải cho iPhone
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Tải cho iPhone
         </button>
       </div>
 
       <!-- Android -->
-      <div class="platform-card android" id="card-android">
-        <div class="platform-card-icon android">🤖</div>
+      <div class="platform-card android">
+        <div class="platform-card-icon android">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+          </svg>
+        </div>
         <div class="platform-card-name">Android</div>
         <div class="platform-card-desc">
-          Tải file APK và cài đặt trực tiếp. Cần bật "Nguồn không xác định".
-          Tương thích Android 8.0 trở lên.
+          Tải file APK và cài đặt trực tiếp. Cần bật "Nguồn không xác định". Tương thích Android 8.0 trở lên.
         </div>
         <div class="platform-tags">
           <span class="ptag ptag-green">Android 8.0+</span>
-          <span class="ptag ptag-cyan">APK</span>
+          <span class="ptag ptag-cyan">File APK</span>
         </div>
         <button class="btn btn-android btn-full" onclick="openModal('modal-android')">
-          <span>🤖</span> Tải APK
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Tải APK
         </button>
       </div>
 
       <!-- Windows -->
-      <div class="platform-card windows" id="card-windows">
-        <div class="platform-card-icon windows">🪟</div>
+      <div class="platform-card windows">
+        <div class="platform-card-icon windows">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+          </svg>
+        </div>
         <div class="platform-card-name">Windows</div>
         <div class="platform-card-desc">
-          Tải bộ cài đặt cho Windows 10/11. Ứng dụng desktop đầy đủ tính năng,
-          hiệu suất cao.
+          Tải bộ cài đặt cho Windows 10/11. Ứng dụng desktop đầy đủ tính năng, hiệu suất cao.
         </div>
         <div class="platform-tags">
           <span class="ptag ptag-cyan">Windows 10/11</span>
           <span class="ptag ptag-purple">EXE</span>
         </div>
         <button class="btn btn-windows btn-full" onclick="startWindowsDownload()">
-          <span>🪟</span> Tải cho Windows
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Tải cho Windows
         </button>
       </div>
 
@@ -155,219 +260,253 @@
 
   <!-- ==================== FEATURES ==================== -->
   <section class="section" id="features">
-    <div style="text-align:center;margin-bottom:52px">
-      <div class="section-label">✨ Tính năng</div>
+    <div class="section-header">
+      <div class="section-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+        Tính năng
+      </div>
       <h2 class="section-title">Tại sao chọn TuPhim?</h2>
       <p class="section-sub">Ứng dụng xem phim tốt nhất, nhanh nhất dành cho người Việt</p>
     </div>
     <div class="features-grid">
       <div class="feature-card">
-        <div class="feature-icon">⚡</div>
+        <div class="feature-icon" style="background:rgba(79,142,247,0.12);color:var(--accent-blue)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+        </div>
         <div class="feature-title">Tốc độ cao</div>
         <div class="feature-desc">Stream phim 4K mượt mà, không giật lag với CDN tốc độ cao toàn cầu.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🎞️</div>
+        <div class="feature-icon" style="background:rgba(139,92,246,0.12);color:var(--accent-purple)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
+            <line x1="7" y1="2" x2="7" y2="22" />
+            <line x1="17" y1="2" x2="17" y2="22" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <line x1="2" y1="7" x2="7" y2="7" />
+            <line x1="2" y1="17" x2="7" y2="17" />
+            <line x1="17" y1="17" x2="22" y2="17" />
+            <line x1="17" y1="7" x2="22" y2="7" />
+          </svg>
+        </div>
         <div class="feature-title">Kho phim khổng lồ</div>
         <div class="feature-desc">Hơn 12.500 bộ phim và series, cập nhật mỗi ngày từ các nguồn uy tín.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🌐</div>
+        <div class="feature-icon" style="background:rgba(34,211,238,0.12);color:var(--accent-cyan)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+        </div>
         <div class="feature-title">Phụ đề Việt</div>
         <div class="feature-desc">Toàn bộ phim có phụ đề tiếng Việt, nhiều phim có lồng tiếng Việt.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">📴</div>
+        <div class="feature-icon" style="background:rgba(16,185,129,0.12);color:var(--accent-green)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </div>
         <div class="feature-title">Xem offline</div>
         <div class="feature-desc">Tải phim về xem khi không có mạng. Dung lượng tối ưu, chất lượng cao.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔒</div>
+        <div class="feature-icon" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
         <div class="feature-title">An toàn &amp; Bảo mật</div>
         <div class="feature-desc">Không quảng cáo, không theo dõi. Quyền riêng tư người dùng được bảo vệ.</div>
       </div>
       <div class="feature-card">
-        <div class="feature-icon">🔄</div>
+        <div class="feature-icon" style="background:rgba(79,142,247,0.12);color:var(--accent-blue)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+          </svg>
+        </div>
         <div class="feature-title">Cập nhật tự động</div>
         <div class="feature-desc">App tự thông báo khi có phiên bản mới, cài đặt nhanh chóng chỉ 1 bấm.</div>
       </div>
     </div>
   </section>
 
-  <!-- ==================== APP SCREENS ==================== -->
-  <section class="section">
-    <div style="text-align:center;margin-bottom:48px">
-      <div class="section-label">📱 Giao diện</div>
-      <h2 class="section-title">Trải nghiệm mượt mà</h2>
-      <p class="section-sub">Giao diện hiện đại, tối ưu cho mọi thiết bị</p>
-    </div>
-    <div class="screens-row">
-      <div class="screen-mockup-placeholder">
-        <div class="ph-icon">🎬</div>
-        <span>Trang chủ</span>
-      </div>
-      <div class="screen-mockup-placeholder">
-        <div class="ph-icon">▶️</div>
-        <span>Xem phim</span>
-      </div>
-      <div class="screen-mockup-placeholder">
-        <div class="ph-icon">🔍</div>
-        <span>Tìm kiếm</span>
-      </div>
-      <div class="screen-mockup-placeholder">
-        <div class="ph-icon">📥</div>
-        <span>Tải về</span>
-      </div>
-      <div class="screen-mockup-placeholder">
-        <div class="ph-icon">⚙️</div>
-        <span>Cài đặt</span>
-      </div>
-    </div>
-  </section>
-
   <!-- ==================== FAQ ==================== -->
   <section class="section" id="faq">
-    <div style="text-align:center;margin-bottom:48px">
-      <div class="section-label">❓ FAQ</div>
+    <div class="section-header">
+      <div class="section-label">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+        FAQ
+      </div>
       <h2 class="section-title">Câu hỏi thường gặp</h2>
       <p class="section-sub">Giải đáp những thắc mắc phổ biến nhất</p>
     </div>
     <div class="faq-list">
-
       <div class="faq-item">
-        <button class="faq-q">
-          <span>Tại sao ứng dụng không có trên App Store?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          TuPhim là ứng dụng tổng hợp phim miễn phí.
-          Bạn có thể tải file IPA và cài đặt theo hướng dẫn của chúng tôi — đơn giản và an toàn.
-        </div>
+        <button class="faq-q"><span>Tại sao ứng dụng không có trên App Store?</span><span
+            class="faq-icon">+</span></button>
+        <div class="faq-a">TuPhim là ứng dụng tổng hợp phim miễn phí. Bạn có thể tải file IPA và cài đặt theo hướng dẫn
+          của chúng tôi — đơn giản và an toàn.</div>
       </div>
-
       <div class="faq-item">
-        <button class="faq-q">
-          <span>Cài IPA trên iPhone có phức tạp không?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          Không hề! Chỉ cần tải file IPA và làm theo hướng dẫn cài đặt của chúng tôi.
-          Thường mất khoảng 5–10 phút là xong. Nhấn nút <strong>"Hướng dẫn cài đặt"</strong> trong
-          modal iOS để xem chi tiết từng bước.
-        </div>
+        <button class="faq-q"><span>Cài IPA trên iPhone có phức tạp không?</span><span
+            class="faq-icon">+</span></button>
+        <div class="faq-a">Không hề! Chỉ cần tải file IPA và làm theo hướng dẫn cài đặt. Thường mất khoảng 5–10 phút.
+          Nhấn nút <strong>"Hướng dẫn cài đặt"</strong> trong modal iOS để xem chi tiết.</div>
       </div>
-
       <div class="faq-item">
-        <button class="faq-q">
-          <span>App có bị xóa sau khi cài không?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          Tùy thuộc vào phương thức cài đặt. Nếu cài đặt đúng theo hướng dẫn, ứng dụng sẽ
-          hoạt động ổn định lâu dài. Chúng tôi cập nhật IPA thường xuyên để tránh tình trạng
-          chứng chỉ hết hạn.
-        </div>
+        <button class="faq-q"><span>App có bị xóa sau khi cài không?</span><span class="faq-icon">+</span></button>
+        <div class="faq-a">Tùy vào phương thức cài đặt. Nếu cài đúng theo hướng dẫn, ứng dụng sẽ hoạt động ổn định lâu
+          dài. Chúng tôi cập nhật IPA thường xuyên để tránh hết hạn chứng chỉ.</div>
       </div>
-
       <div class="faq-item">
-        <button class="faq-q">
-          <span>Có cần jailbreak iPhone không?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          Không cần jailbreak. TuPhim được cài đặt qua phương thức hợp lệ, không yêu cầu
-          bất kỳ thay đổi hệ thống nào trên thiết bị của bạn.
-        </div>
+        <button class="faq-q"><span>Có cần jailbreak iPhone không?</span><span class="faq-icon">+</span></button>
+        <div class="faq-a">Không cần jailbreak. TuPhim được cài đặt qua phương thức hợp lệ, không yêu cầu bất kỳ thay
+          đổi hệ thống nào trên thiết bị của bạn.</div>
       </div>
-
       <div class="faq-item">
-        <button class="faq-q">
-          <span>Cài APK Android như thế nào?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          Tải file APK → mở file → nếu bị chặn hãy vào <strong>Cài đặt → Bảo mật → Nguồn không xác định</strong>
-          → bật lên → cài đặt lại. Nhấn nút <strong>"Hướng dẫn cài đặt"</strong> trong modal Android
-          để xem hướng dẫn chi tiết.
-        </div>
+        <button class="faq-q"><span>Cài APK Android như thế nào?</span><span class="faq-icon">+</span></button>
+        <div class="faq-a">Tải file APK → mở file → nếu bị chặn hãy vào <strong>Cài đặt → Bảo mật → Nguồn không xác định
+            → Bật</strong>. Xem hướng dẫn chi tiết trong modal Android.</div>
       </div>
-
       <div class="faq-item">
-        <button class="faq-q">
-          <span>Ứng dụng có miễn phí không?</span>
-          <span class="faq-icon">+</span>
-        </button>
-        <div class="faq-a">
-          Hoàn toàn miễn phí! Không có phí đăng ký, không quảng cáo, không mua thêm.
-          TuPhim là dự án phi lợi nhuận phục vụ cộng đồng người Việt.
-        </div>
+        <button class="faq-q"><span>Ứng dụng có miễn phí không?</span><span class="faq-icon">+</span></button>
+        <div class="faq-a">Hoàn toàn miễn phí! Không phí đăng ký, không quảng cáo, không mua thêm. TuPhim là dự án phi
+          lợi nhuận phục vụ cộng đồng người Việt.</div>
       </div>
-
     </div>
   </section>
 
   <!-- ==================== FOOTER ==================== -->
   <footer>
+    <div class="footer-brand">
+      <img src="assets/logo.png" alt="TuPhim" style="height:32px;border-radius:8px" />
+      <span>TuPhim</span>
+    </div>
     <p>© 2026 TuPhim — Ứng dụng xem phim miễn phí cho người Việt.</p>
     <div class="footer-links">
-      <a href="#">Điều khoản sử dụng</a>
+      <a href="#">Điều khoản</a>
       <a href="#">Quyền riêng tư</a>
       <a href="#download">Tải xuống</a>
       <a href="#faq">FAQ</a>
     </div>
   </footer>
 
-  <!-- ==================================================
-       MODAL: CHỌN NỀN TẢNG (nút hero)
-       ========================================== -->
+  <!-- ==================== MODAL: CHỌN NỀN TẢNG ==================== -->
   <div class="modal-overlay" id="modal-platforms">
-    <div class="modal" style="max-width:420px">
-      <button class="modal-close" onclick="closeModal('modal-platforms')">✕</button>
-      <div class="modal-icon">📲</div>
+    <div class="modal modal-sm">
+      <button class="modal-close" onclick="closeModal('modal-platforms')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      <div class="modal-icon-wrap">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+          <line x1="12" y1="18" x2="12.01" y2="18" />
+        </svg>
+      </div>
       <h2 class="modal-title">Chọn thiết bị của bạn</h2>
       <p class="modal-sub">Bạn đang dùng nền tảng nào?</p>
       <div class="platform-list">
         <button class="platform-select-btn psb-ios" onclick="closeModal('modal-platforms'); openModal('modal-ios')">
-          <span class="psb-icon">🍎</span>
+          <div class="psb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+              fill="currentColor">
+              <path
+                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+            </svg></div>
           <div class="psb-info">
             <div class="psb-name">iPhone / iPad</div>
             <div class="psb-sub">iOS 14.0+ · File IPA</div>
           </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
         <button class="platform-select-btn psb-android"
           onclick="closeModal('modal-platforms'); openModal('modal-android')">
-          <span class="psb-icon">🤖</span>
+          <div class="psb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+              fill="currentColor">
+              <path
+                d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+            </svg></div>
           <div class="psb-info">
             <div class="psb-name">Android</div>
             <div class="psb-sub">Android 8.0+ · File APK</div>
           </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
         <button class="platform-select-btn psb-windows" onclick="closeModal('modal-platforms'); startWindowsDownload()">
-          <span class="psb-icon">🪟</span>
+          <div class="psb-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+              fill="currentColor">
+              <path
+                d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801" />
+            </svg></div>
           <div class="psb-info">
             <div class="psb-name">Windows</div>
-            <div class="psb-sub">Windows 10/11 · EXE Installer</div>
+            <div class="psb-sub">Windows 10/11 · EXE</div>
           </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- ==========================================
-       MODAL: iOS
-       ========================================== -->
+  <!-- ==================== MODAL: iOS ==================== -->
   <div class="modal-overlay" id="modal-ios">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('modal-ios')">✕</button>
-
+      <button class="modal-close" onclick="closeModal('modal-ios')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
       <div class="dl-modal-header">
-        <div class="dl-modal-platform-icon ios">🍎</div>
+        <div class="dl-modal-platform-icon ios">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+          </svg>
+        </div>
         <div>
           <div class="dl-modal-title">Tải TuPhim cho iOS</div>
           <div class="dl-modal-version" id="ios-modal-version">iOS 14.0+ · File IPA</div>
         </div>
       </div>
-
       <div class="dl-steps">
         <div class="dl-step">
           <div class="dl-step-num">1</div>
@@ -391,40 +530,62 @@
           </div>
         </div>
       </div>
-
       <div class="dl-info-box">
-        💡 <strong>Lưu ý:</strong> File IPA chỉ cài được qua công cụ hỗ trợ
-        (Sideloadly, AltStore, v.v.). Xem hướng dẫn chi tiết bên dưới.
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span><strong>Lưu ý:</strong> File IPA cần cài qua công cụ hỗ trợ (Sideloadly, AltStore…). Xem hướng dẫn bên
+          dưới.</span>
       </div>
-
       <div class="dl-actions">
         <a href="/api/download/ios" class="btn btn-ios btn-full" id="btn-ios-download"
-          onclick="showToast('📥','Đang tải IPA…')">
-          <span>⬇️</span> Tải file IPA
+          onclick="showToast('Đang tải IPA…')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Tải file IPA
         </a>
         <div class="dl-divider">hoặc</div>
         <a href="#" class="btn btn-ghost btn-full" id="btn-ios-guide" target="_blank" rel="noopener">
-          <span>📖</span> Hướng dẫn cài đặt
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+          Hướng dẫn cài đặt
         </a>
       </div>
     </div>
   </div>
 
-  <!-- ==========================================
-       MODAL: Android
-       ========================================== -->
+  <!-- ==================== MODAL: Android ==================== -->
   <div class="modal-overlay" id="modal-android">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('modal-android')">✕</button>
-
+      <button class="modal-close" onclick="closeModal('modal-android')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
       <div class="dl-modal-header">
-        <div class="dl-modal-platform-icon android">🤖</div>
+        <div class="dl-modal-platform-icon android">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.523 15.34l1.43 2.484a.693.693 0 1 1-1.205.695l-1.447-2.511A8.5 8.5 0 0 1 12 16.5a8.5 8.5 0 0 1-4.3-1.492L6.252 17.52a.693.693 0 1 1-1.205-.695l1.43-2.484A8.466 8.466 0 0 1 3.5 8H20.5a8.466 8.466 0 0 1-2.977 7.34zM9 11a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM7.5 5.196l-1.5-2.6a.5.5 0 0 1 .866-.5l1.539 2.666A8.496 8.496 0 0 1 12 4c1.27 0 2.476.278 3.562.775L17.1 2.109a.5.5 0 0 1 .866.5L16.5 5.196A8.479 8.479 0 0 1 20.5 8H3.5a8.48 8.48 0 0 1 4-2.804z" />
+          </svg>
+        </div>
         <div>
           <div class="dl-modal-title">Tải TuPhim cho Android</div>
           <div class="dl-modal-version" id="android-modal-version">Android 8.0+ · File APK</div>
         </div>
       </div>
-
       <div class="dl-steps">
         <div class="dl-step">
           <div class="dl-step-num">1</div>
@@ -448,20 +609,32 @@
           </div>
         </div>
       </div>
-
       <div class="dl-info-box green">
-        ✅ <strong>Đơn giản hơn iOS!</strong> Android chỉ cần tải APK và bấm cài đặt.
-        Nếu gặp lỗi, xem hướng dẫn chi tiết bên dưới.
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span><strong>Đơn giản hơn iOS!</strong> Android chỉ cần tải APK và bấm cài đặt.</span>
       </div>
-
       <div class="dl-actions">
         <a href="/api/download/apk" class="btn btn-android btn-full" id="btn-android-download"
-          onclick="showToast('📥','Đang tải APK…')">
-          <span>⬇️</span> Tải file APK
+          onclick="showToast('Đang tải APK…')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+          Tải file APK
         </a>
         <div class="dl-divider">cần trợ giúp?</div>
         <a href="#" class="btn btn-ghost btn-full" id="btn-android-guide" target="_blank" rel="noopener">
-          <span>📖</span> Hướng dẫn cài đặt
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+          Hướng dẫn cài đặt
         </a>
       </div>
     </div>

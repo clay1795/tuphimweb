@@ -103,6 +103,14 @@ router.post('/upload', upload.single('file'), (req, res) => {
 });
 
 // ============================================================
+// DELETE /api/admin/releases/:id — delete a release
+// ============================================================
+router.delete('/releases/:id', (req, res) => {
+    db.deleteRelease(req.params.id);
+    res.json({ success: true });
+});
+
+// ============================================================
 // POST /api/admin/sign — manually sign IPA for a session
 // ============================================================
 router.post('/sign', async (req, res) => {
