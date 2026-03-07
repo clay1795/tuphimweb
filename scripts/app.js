@@ -127,10 +127,45 @@ async function fetchAppInfo() {
       const btn = document.getElementById('btn-android-download');
       if (btn) { btn.href = '#'; btn.innerHTML = `${ICONS.disk} Sắp có — chưa có APK`; btn.style.opacity = '.55'; btn.style.pointerEvents = 'none'; }
     }
+
+    // Dim platform cards that have no file — only available ones "light up"
+    dimPlatformCard('ios', data.hasIPA);
+    dimPlatformCard('android', data.hasAPK);
+    dimPlatformCard('windows', data.hasWindows);
+
   } catch (e) {
     console.warn('[TuPhim] Could not fetch app info:', e.message);
   }
 }
+
+// ============================================================
+// DIM / ENABLE PLATFORM CARD
+// ============================================================
+function dimPlatformCard(platform, hasFile) {
+  // Find card by looking for the btn-{platform} button inside it
+  const btn = document.querySelector(`.platform-card .btn-${platform === 'ios' ? 'ios' : platform === 'android' ? 'android' : 'windows'}`);
+  if (!btn) return;
+  const card = btn.closest('.platform-card');
+  if (!card) return;
+
+  if (!hasFile) {
+    // Dim the card
+    card.style.opacity = '0.45';
+    card.style.filter = 'grayscale(0.6)';
+    card.style.pointerEvents = 'none';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    // Add "Sắp có" badge to button
+    btn.innerHTML = `${ICONS.disk} Sắp có`;
+  } else {
+    // Make sure it's fully visible (in case it was previously dimmed)
+    card.style.opacity = '1';
+    card.style.filter = '';
+    card.style.pointerEvents = '';
+    btn.disabled = false;
+  }
+}
+
 
 // ============================================================
 // FAQ ACCORDION
