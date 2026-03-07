@@ -6,7 +6,7 @@ const fs = require('fs');
 const rateLimit = require('express-rate-limit');
 
 // ============================================================
-// DECODE CERTIFICATES FROM ENV (for Render.com / cloud deploy)
+// DECODE CERTIFICATES FROM ENV
 // ============================================================
 function setupCerts() {
     const certDir = path.resolve(process.env.CERT_PATH ? path.dirname(process.env.CERT_PATH) : '../certificate');
@@ -16,46 +16,118 @@ function setupCerts() {
         const certOut = path.resolve(process.env.CERT_PATH || '../certificate/cert_legacy.p12');
         if (!fs.existsSync(certOut)) {
             fs.writeFileSync(certOut, Buffer.from(process.env.CERT_P12_BASE64, 'base64'));
-            console.log('✅ cert_legacy.p12 decoded from CERT_P12_BASE64 env var');
+            console.log('[CERT] cert_legacy.p12 decoded from env');
         }
     }
     if (process.env.PROVISION_BASE64) {
         const provOut = path.resolve(process.env.PROVISION_PATH || '../certificate/cert.mobileprovision');
         if (!fs.existsSync(provOut)) {
             fs.writeFileSync(provOut, Buffer.from(process.env.PROVISION_BASE64, 'base64'));
-            console.log('✅ cert.mobileprovision decoded from PROVISION_BASE64 env var');
+            console.log('[CERT] cert.mobileprovision decoded from env');
         }
     }
 }
 setupCerts();
 
-
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ============================================================
-// MIDDLEWARE
+// SECURITY: Remove X-Powered-By fingerprint
 // ============================================================
-app.use(cors({
-    origin: true, // Allow all origins — security handled by JWT tokens
-    credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.disable('x-powered-by');
 
-// Rate limiter for UDID profile endpoint (10 req/min per IP)
-const udidLimiter = rateLimit({
-    windowMs: 60 * 1000,
-    max: 10,
-    message: { error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.' }
+// ============================================================
+// SECURITY: Headers (helmet-lite, no dependencies)
+// ============================================================
+app.use((req, res, next) => {
+    // Prevent clickjacking
+    res.setHeader('X-Frame-Options', 'DENY');
+    // Prevent MIME-type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    // XSS protection (legacy browsers)
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    // No referrer leak
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    // HSTS (only meaningful over HTTPS)
+    res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    // Permissions policy
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    next();
 });
 
-// Rate limiter for login endpoint
+// ============================================================
+// CORS — restrict to known origins
+// ============================================================
+const allowedOrigins = [
+    'https://tuphim.online',
+    'https://www.tuphim.online',
+    /^http:\/\/localhost(:\d+)?$/,
+    /^http:\/\/127\.0\.0\.1(:\d+)?$/,
+];
+app.use(cors({
+    origin: (origin, cb) => {
+        if (!origin) return cb(null, true); // server-to-server / curl
+        const ok = allowedOrigins.some(o =>
+            typeof o === 'string' ? o === origin : o.test(origin)
+        );
+        if (ok) cb(null, true);
+        else cb(new Error('CORS policy: origin not allowed'));
+    },
+    credentials: true,
+}));
+
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+// ============================================================
+// RATE LIMITERS
+// ============================================================
+const udidLimiter = rateLimit({
+    windowMs: 60 * 1000, max: 10,
+    message: { error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.' },
+    standardHeaders: true, legacyHeaders: false,
+});
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    message: { error: 'Quá nhiều lần đăng nhập sai. Vui lòng thử lại sau 15 phút.' }
+    windowMs: 15 * 60 * 1000, max: 10,
+    message: { error: 'Quá nhiều lần đăng nhập sai. Thử lại sau 15 phút.' },
+    standardHeaders: true, legacyHeaders: false,
+});
+const apiLimiter = rateLimit({
+    windowMs: 60 * 1000, max: 120,
+    message: { error: 'Quá nhiều yêu cầu.' },
+    standardHeaders: true, legacyHeaders: false,
+});
+const adminApiLimiter = rateLimit({
+    windowMs: 60 * 1000, max: 60,
+    message: { error: 'Too many admin requests.' },
+    standardHeaders: true, legacyHeaders: false,
+});
+
+// ============================================================
+// BLOCK SENSITIVE PATHS — before static serving
+// Completely deny access to /admin, /server, /certificate, etc.
+// ============================================================
+const BLOCKED_PATHS = [
+    /^\/admin(\/|$)/i,         // old admin path
+    /^\/server(\/|$)/i,        // server source code
+    /^\/certificate(\/|$)/i,   // certificates folder
+    /^\/deploy(\/|$)/i,        // deploy configs
+    /^\/\.env/i,               // .env files
+    /^\/\.git(\/|$)/i,         // git repo
+    /^\/node_modules(\/|$)/i,  // node modules
+    /^\/storage(\/|$)/i,       // raw storage
+    /^\/package\.json/i,       // package info
+    /^\/package-lock\.json/i,
+    /^\/render\.yaml/i,
+];
+app.use((req, res, next) => {
+    const isBlocked = BLOCKED_PATHS.some(pattern => pattern.test(req.path));
+    if (isBlocked) {
+        // Return a plain 404 HTML page — not a JSON error (looks like generic 404, not a blocked endpoint)
+        return res.status(404).send(`<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1><p>The requested URL was not found on this server.</p></body></html>`);
+    }
+    next();
 });
 
 // ============================================================
@@ -77,24 +149,21 @@ const downloadRoutes = require('./routes/download');
 
 app.use('/api/auth', loginLimiter, authRoutes);
 app.use('/api/udid', udidLimiter, udidRoutes);
-app.use('/api/admin', adminRoutes);   // JWT protection inside route file
-app.use('/api/download', downloadRoutes);
+app.use('/api/admin', adminApiLimiter, adminRoutes);   // JWT protection inside route file
+app.use('/api/download', apiLimiter, downloadRoutes);
 
 // ============================================================
-// HEALTH CHECK
+// PUBLIC: HEALTH CHECK
 // ============================================================
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'ok',
-        version: process.env.APP_VERSION || '2.1.0',
-        timestamp: new Date().toISOString()
-    });
+app.get('/api/health', apiLimiter, (req, res) => {
+    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+    // Note: don't expose version or server details
 });
 
 // ============================================================
-// PUBLIC APP INFO — used by frontend to get version & guide URLs
+// PUBLIC: APP INFO — frontend dynamic data
 // ============================================================
-app.get('/api/info', (req, res) => {
+app.get('/api/info', apiLimiter, (req, res) => {
     const db = require('./utils/db');
     const releases = db.getReleases();
     const settings = db.getSettings();
@@ -118,41 +187,56 @@ app.get('/api/info', (req, res) => {
 });
 
 // ============================================================
-// SERVE STATIC FRONTEND (for production)
-// When deployed, Nginx serves frontend directly.
-// This is just for local dev convenience.
+// SERVE STATIC FRONTEND (after all security middleware)
 // ============================================================
 const frontendPath = path.join(__dirname, '..');
 
-// Block /admin path — it should not be accessible, only /qltv-tp8x2024/
-app.use('/admin', (req, res) => {
-    res.status(404).json({ error: 'Not found' });
-});
-
-app.use(express.static(frontendPath));
+// Serve with security-friendly options:
+// - index: true so / serves index.html
+// - dotfiles: deny prevents .env, .git etc (belt-and-suspenders with BLOCKED_PATHS)
+// - etag: true for caching
+app.use(express.static(frontendPath, {
+    dotfiles: 'deny',
+    index: 'index.html',
+    setHeaders: (res, filePath) => {
+        // Deny serving any file inside sensitive directories
+        const rel = path.relative(frontendPath, filePath).replace(/\\/g, '/');
+        const sensitiveDir = /^(admin|server|certificate|deploy|node_modules|storage)\//i;
+        if (sensitiveDir.test(rel)) {
+            res.statusCode = 404;
+        }
+        // Cache static assets
+        if (/\.(css|js|png|jpg|svg|ico|woff2?)$/.test(filePath)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
+    },
+}));
 
 // ============================================================
-// 404 fallback
+// 404
 // ============================================================
 app.use((req, res) => {
-    res.status(404).json({ error: 'Not found' });
+    res.status(404).send(`<!DOCTYPE html><html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>`);
 });
 
 // ============================================================
-// ERROR HANDLER
+// GLOBAL ERROR HANDLER
 // ============================================================
 app.use((err, req, res, next) => {
+    // Don't leak error details in production
     console.error('[ERROR]', err.message);
-    res.status(500).json({ error: 'Lỗi server. Vui lòng thử lại.' });
+    if (err.message?.includes('CORS')) {
+        return res.status(403).json({ error: 'Forbidden' });
+    }
+    res.status(500).json({ error: 'Internal server error' });
 });
 
 // ============================================================
 // START
 // ============================================================
 app.listen(PORT, () => {
-    console.log(`✅ TuPhim Distribution Server running on port ${PORT}`);
-    console.log(`📡 API: http://localhost:${PORT}/api/health`);
-    console.log(`🔐 Admin path: ${process.env.ADMIN_SECRET_PATH || 'NOT SET'}`);
+    console.log(`[SERVER] TuPhim Distribution running on port ${PORT}`);
+    console.log(`[SECURITY] /admin blocked | sensitive paths blocked`);
 });
 
 module.exports = app;
