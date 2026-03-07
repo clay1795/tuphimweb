@@ -1,6 +1,5 @@
 // ============================================================
-// TuPhim Admin Panel — admin.js
-// Real API-connected: upload, releases list, guide settings
+// TuPhim Admin Panel — admin.js (qltv-tp8x2024)
 // ============================================================
 
 const ADMIN_API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
@@ -9,7 +8,6 @@ const ADMIN_API = (window.location.hostname === 'localhost' || window.location.h
 
 let adminToken = sessionStorage.getItem('admin_token') || '';
 
-// ---- Auth headers ----
 function authHeaders(extra = {}) {
     return { 'Authorization': 'Bearer ' + adminToken, ...extra };
 }
@@ -18,34 +16,33 @@ function authHeaders(extra = {}) {
 function showPanel(id, el) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
+    const panel = document.getElementById('panel-' + id);
+    if (panel) panel.classList.add('active');
     if (el) el.classList.add('active');
-    const titles = { dashboard: 'Dashboard', releases: 'Upload & Releases', settings: 'Cài đặt' };
-    document.getElementById('topbar-title').textContent = titles[id] || id;
+    const titles = { dashboard: 'Dashboard', releases: 'Upload & Releases', settings: 'Cai dat' };
+    const titleEl = document.getElementById('topbar-title');
+    if (titleEl) titleEl.textContent = titles[id] || id;
     if (id === 'dashboard') loadDashboard();
     if (id === 'releases') loadReleases();
     if (id === 'settings') loadGuideUrls();
 }
 
 // ---- Toast ----
-function showToast(msg, type = 'info') {
+function showToast(msg, type) {
+    type = type || 'info';
     let t = document.getElementById('admin-toast');
     if (!t) {
-        t = document.createElement('div'); t.id = 'admin-toast';
-        t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;
-      background:#101828;border:1px solid rgba(255,255,255,0.1);border-radius:12px;
-      padding:14px 20px;font-size:14px;color:#f1f5f9;font-family:Inter,sans-serif;
-      box-shadow:0 4px 24px rgba(0,0,0,.5);min-width:240px;
-      transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);
-      display:flex;align-items:center;gap:10px`;
+        t = document.createElement('div');
+        t.id = 'admin-toast';
+        t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;background:#101828;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 20px;font-size:14px;color:#f1f5f9;font-family:Inter,sans-serif;box-shadow:0 4px 24px rgba(0,0,0,.5);min-width:240px;transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:10px';
         document.body.appendChild(t);
     }
     const colors = { success: '#10b981', error: '#ef4444', info: '#4f8ef7', warn: '#f59e0b' };
-    const icons = { success: '✓', error: '✗', info: 'ℹ', warn: '⚠' };
-    t.innerHTML = `<span style="color:${colors[type]};font-size:18px;font-weight:bold">${icons[type]}</span><span>${msg}</span>`;
-    setTimeout(() => { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
+    const icons = { success: 'OK', error: 'X', info: 'i', warn: '!' };
+    t.innerHTML = '<span style="color:' + (colors[type] || '#4f8ef7') + ';font-size:18px;font-weight:bold">' + (icons[type] || 'i') + '</span><span>' + msg + '</span>';
+    setTimeout(function () { t.style.transform = 'translateY(0)'; t.style.opacity = '1'; }, 10);
     clearTimeout(t._timer);
-    t._timer = setTimeout(() => { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 4000);
+    t._timer = setTimeout(function () { t.style.transform = 'translateY(80px)'; t.style.opacity = '0'; }, 4000);
 }
 
 // ---- Logout ----
@@ -57,259 +54,253 @@ function logout() {
 // ============================================================
 // DASHBOARD
 // ============================================================
-async function loadDashboard() {
-    try {
-        const [statsRes, releasesRes] = await Promise.all([
-            fetch(`${ADMIN_API}/stats`, { headers: authHeaders() }),
-            fetch(`${ADMIN_API}/releases`, { headers: authHeaders() }),
-        ]);
-        // Stats
+function loadDashboard() {
+    Promise.all([
+        fetch(ADMIN_API + '/stats', { headers: authHeaders() }),
+        fetch(ADMIN_API + '/releases', { headers: authHeaders() }),
+    ]).then(function (results) {
+        var statsRes = results[0];
+        var releasesRes = results[1];
+
         if (statsRes.ok) {
-            const s = await statsRes.json();
-            setText('stat-total-releases', s.totalReleases ?? '—');
-            setText('stat-active-releases', s.activeReleases ?? '—');
-            setText('stat-latest-ver', s.latestVersion || '—');
-            document.getElementById('server-status').textContent = '● Hoạt động';
-            document.getElementById('server-status').style.color = 'var(--accent-green)';
+            statsRes.json().then(function (s) {
+                setText('stat-total-releases', s.totalReleases !== undefined ? String(s.totalReleases) : 'N/A');
+                setText('stat-active-releases', s.activeReleases !== undefined ? String(s.activeReleases) : 'N/A');
+                setText('stat-latest-ver', s.latestVersion || 'N/A');
+                var ss = document.getElementById('server-status');
+                if (ss) { ss.textContent = 'Hoat dong'; ss.style.color = 'var(--accent-green)'; }
+            });
         }
 
-        // Platform status
         if (releasesRes.ok) {
-            const releases = await releasesRes.json();
-            const active = r => releases.find(x => x.platform === r && x.active);
-            const iosR = active('ios'), andR = active('android'), winR = active('windows');
-            setStatus('psi-ios-status', iosR, iosR ? `v${iosR.version} · ${fmtSize(iosR.fileSize)}` : 'Chưa có IPA');
-            setStatus('psi-android-status', andR, andR ? `v${andR.version} · ${fmtSize(andR.fileSize)}` : 'Chưa có APK');
-            setStatus('psi-windows-status', winR, winR ? `v${winR.version} · ${fmtSize(winR.fileSize)}` : 'Chưa có EXE');
-
-            // Last upload date
-            const sorted = [...releases].sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-            if (sorted[0]) {
-                const d = new Date(sorted[0].uploadedAt);
-                setText('stat-last-upload', d.toLocaleDateString('vi-VN'));
-            } else {
-                setText('stat-last-upload', '—');
-            }
+            releasesRes.json().then(function (releases) {
+                function active(p) { return releases.find(function (x) { return x.platform === p && x.active; }); }
+                var iosR = active('ios'), andR = active('android'), winR = active('windows');
+                setStatus('psi-ios-status', iosR, iosR ? 'v' + iosR.version + ' - ' + fmtSize(iosR.fileSize) : 'Chua co IPA');
+                setStatus('psi-android-status', andR, andR ? 'v' + andR.version + ' - ' + fmtSize(andR.fileSize) : 'Chua co APK');
+                setStatus('psi-windows-status', winR, winR ? 'v' + winR.version + ' - ' + fmtSize(winR.fileSize) : 'Chua co EXE');
+                var sorted = releases.slice().sort(function (a, b) { return new Date(b.uploadedAt) - new Date(a.uploadedAt); });
+                if (sorted[0]) setText('stat-last-upload', new Date(sorted[0].uploadedAt).toLocaleDateString('vi-VN'));
+                else setText('stat-last-upload', 'N/A');
+            });
         }
-    } catch (e) {
-        document.getElementById('server-status').textContent = '● Mất kết nối';
-        document.getElementById('server-status').style.color = 'var(--accent-orange)';
-    }
+    }).catch(function () {
+        var ss = document.getElementById('server-status');
+        if (ss) { ss.textContent = 'Mat ket noi'; ss.style.color = 'var(--accent-orange)'; }
+    });
 }
 
 // ============================================================
 // RELEASES TABLE
 // ============================================================
-async function loadReleases() {
-    const tbody = document.getElementById('releases-tbody');
+function loadReleases() {
+    var tbody = document.getElementById('releases-tbody');
     if (!tbody) return;
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Đang tải…</td></tr>`;
-    try {
-        const res = await fetch(`${ADMIN_API}/releases`, { headers: authHeaders() });
-        if (!res.ok) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lỗi tải danh sách</td></tr>`; return; }
-        const releases = await res.json();
-        if (!releases.length) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Chưa có release nào. Upload file ở trên để bắt đầu.</td></tr>`;
-            return;
-        }
-        // Sort newest first
-        releases.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-        tbody.innerHTML = releases.map(r => {
-            const platIcons = { ios: '🍎', android: '🤖', windows: '🪟' };
-            const platLabels = { ios: 'iOS', android: 'Android', windows: 'Windows' };
-            const platColors = { ios: 'badge-blue', android: 'badge-green', windows: 'badge-purple' };
-            const date = new Date(r.uploadedAt).toLocaleDateString('vi-VN');
-            return `<tr>
-        <td><span class="badge ${platColors[r.platform]}">${platIcons[r.platform]} ${platLabels[r.platform]}</span></td>
-        <td><strong>v${r.version}</strong></td>
-        <td style="color:var(--text-secondary);font-size:13px">${fmtSize(r.fileSize)}</td>
-        <td>${r.active ? '<span class="badge badge-green"><span class="badge-dot"></span>Live</span>' : '<span class="badge badge-gray">Cũ</span>'}</td>
-        <td style="font-size:12px;color:var(--text-secondary)">${date}</td>
-        <td>
-          <button class="btn btn-sm btn-danger" onclick="deleteRelease('${r.id}')">Xoá</button>
-        </td>
-      </tr>`;
-        }).join('');
-    } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Lỗi kết nối server</td></tr>`;
-    }
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Dang tai...</td></tr>';
+    fetch(ADMIN_API + '/releases', { headers: authHeaders() })
+        .then(function (res) {
+            if (!res.ok) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Loi tai danh sach</td></tr>'; return; }
+            res.json().then(function (releases) {
+                if (!releases.length) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:32px">Chua co release nao.</td></tr>';
+                    return;
+                }
+                releases.sort(function (a, b) { return new Date(b.uploadedAt) - new Date(a.uploadedAt); });
+                var platLabels = { ios: 'iOS', android: 'Android', windows: 'Windows' };
+                var platCls = { ios: 'badge-blue', android: 'badge-green', windows: 'badge-purple' };
+                tbody.innerHTML = releases.map(function (r) {
+                    var date = new Date(r.uploadedAt).toLocaleDateString('vi-VN');
+                    return '<tr>' +
+                        '<td><span class="badge ' + (platCls[r.platform] || '') + '">' + (platLabels[r.platform] || r.platform) + '</span></td>' +
+                        '<td><strong>v' + r.version + '</strong></td>' +
+                        '<td style="color:var(--text-secondary);font-size:13px">' + fmtSize(r.fileSize) + '</td>' +
+                        '<td>' + (r.active ? '<span class="badge badge-green"><span class="badge-dot"></span>Live</span>' : '<span class="badge badge-gray">Cu</span>') + '</td>' +
+                        '<td style="font-size:12px;color:var(--text-secondary)">' + date + '</td>' +
+                        '<td><button class="btn btn-sm btn-danger" onclick="deleteRelease(\'' + r.id + '\')">Xoa</button></td>' +
+                        '</tr>';
+                }).join('');
+            });
+        })
+        .catch(function () {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--accent-orange);padding:32px">Loi ket noi server</td></tr>';
+        });
 }
 
-async function deleteRelease(id) {
-    if (!confirm('Xoá release này?')) return;
-    try {
-        const res = await fetch(`${ADMIN_API}/releases/${id}`, { method: 'DELETE', headers: authHeaders() });
-        if (res.ok) { showToast('Đã xoá release!', 'success'); loadReleases(); loadDashboard(); }
-        else showToast('Lỗi khi xoá', 'error');
-    } catch { showToast('Không kết nối được server', 'error'); }
+function deleteRelease(id) {
+    if (!confirm('Xoa release nay?')) return;
+    fetch(ADMIN_API + '/releases/' + id, { method: 'DELETE', headers: authHeaders() })
+        .then(function (res) {
+            if (res.ok) { showToast('Da xoa release!', 'success'); loadReleases(); loadDashboard(); }
+            else showToast('Loi khi xoa', 'error');
+        })
+        .catch(function () { showToast('Khong ket noi duoc server', 'error'); });
 }
 
 // ============================================================
 // FILE SELECT & UPLOAD
 // ============================================================
-const selectedFiles = {};
+var selectedFiles = {};
 
 function handleFile(input, type) {
-    const file = input.files[0];
+    var file = input.files[0];
     if (!file) return;
     selectedFiles[type] = file;
-    const drop = document.getElementById('drop-' + type);
+    var drop = document.getElementById('drop-' + type);
     if (drop) {
-        drop.querySelector('.dz-text').innerHTML = `<strong>${file.name}</strong>`;
+        drop.querySelector('.dz-text').innerHTML = '<strong>' + file.name + '</strong>';
         drop.querySelector('.dz-sub').textContent = fmtSize(file.size);
         drop.style.borderColor = 'var(--accent-blue)';
-        drop.style.background = 'rgba(79,142,247,0.04)';
     }
-    document.getElementById('btn-upload-' + type).disabled = false;
+    var btn = document.getElementById('btn-upload-' + type);
+    if (btn) btn.disabled = false;
 }
 
 function initDragDrop(type) {
-    const drop = document.getElementById('drop-' + type);
+    var drop = document.getElementById('drop-' + type);
     if (!drop) return;
-    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent-blue)'; });
-    drop.addEventListener('dragleave', () => drop.style.borderColor = '');
-    drop.addEventListener('drop', e => {
+    drop.addEventListener('dragover', function (e) { e.preventDefault(); drop.style.borderColor = 'var(--accent-blue)'; });
+    drop.addEventListener('dragleave', function () { drop.style.borderColor = ''; });
+    drop.addEventListener('drop', function (e) {
         e.preventDefault(); drop.style.borderColor = '';
-        const file = e.dataTransfer.files[0];
+        var file = e.dataTransfer.files[0];
         if (file) {
-            const input = document.getElementById('file-' + type);
-            const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
-            handleFile(input, type);
+            var input = document.getElementById('file-' + type);
+            try { var dt = new DataTransfer(); dt.items.add(file); input.files = dt.files; } catch (e2) { }
+            selectedFiles[type] = file;
+            drop.querySelector('.dz-text').innerHTML = '<strong>' + file.name + '</strong>';
+            drop.querySelector('.dz-sub').textContent = fmtSize(file.size);
+            drop.style.borderColor = 'var(--accent-blue)';
+            var btn = document.getElementById('btn-upload-' + type);
+            if (btn) btn.disabled = false;
         }
     });
 }
 
-async function uploadFile(type) {
-    const file = selectedFiles[type];
-    if (!file) return showToast('Chọn file trước!', 'warn');
-    const verInput = document.getElementById('ver-' + type);
-    const version = verInput?.value?.trim() || '1.0.0';
-    const setActive = document.getElementById('active-' + type)?.checked;
+var BTN_LABELS = { ipa: 'Upload IPA', apk: 'Upload APK', win: 'Upload EXE' };
+var VALID_EXTS = { ipa: ['ipa'], apk: ['apk'], win: ['exe', 'msix'] };
 
-    const ext = file.name.split('.').pop().toLowerCase();
-    const validMap = { ipa: ['ipa'], apk: ['apk'], win: ['exe', 'msix'] };
-    if (!validMap[type]?.includes(ext)) return showToast(`File không hợp lệ (.${ext})`, 'error');
+function uploadFile(type) {
+    var file = selectedFiles[type];
+    if (!file) { showToast('Chon file truoc!', 'warn'); return; }
+    var verInput = document.getElementById('ver-' + type);
+    var version = verInput && verInput.value.trim() ? verInput.value.trim() : '1.0.0';
+    var setActive = document.getElementById('active-' + type) ? document.getElementById('active-' + type).checked : true;
 
-    const formData = new FormData();
+    var ext = file.name.split('.').pop().toLowerCase();
+    if (VALID_EXTS[type].indexOf(ext) === -1) { showToast('File khong hop le (.' + ext + ')', 'error'); return; }
+
+    var formData = new FormData();
     formData.append('file', file);
     formData.append('version', version);
     formData.append('setActive', setActive ? 'true' : 'false');
 
-    // Show progress
-    const prog = document.getElementById('prog-' + type);
-    const progFill = document.getElementById('prog-' + type + '-fill');
-    const progPct = document.getElementById('prog-' + type + '-pct');
-    const progName = document.getElementById('prog-' + type + '-name');
-    if (prog) { prog.style.display = 'block'; progName.textContent = file.name; }
+    var prog = document.getElementById('prog-' + type);
+    var progFill = document.getElementById('prog-' + type + '-fill');
+    var progPct = document.getElementById('prog-' + type + '-pct');
+    var progName = document.getElementById('prog-' + type + '-name');
+    if (prog) { prog.style.display = 'block'; if (progName) progName.textContent = file.name; }
 
-    const btn = document.getElementById('btn-upload-' + type);
-    btn.disabled = true; btn.textContent = 'Đang upload…';
+    var btn = document.getElementById('btn-upload-' + type);
+    if (btn) { btn.disabled = true; btn.textContent = 'Dang upload...'; }
 
-    try {
-        await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', `${ADMIN_API}/upload`);
-            xhr.setRequestHeader('Authorization', 'Bearer ' + adminToken);
-            xhr.upload.onprogress = e => {
-                if (e.lengthComputable) {
-                    const pct = Math.round((e.loaded / e.total) * 100);
-                    if (progFill) progFill.style.width = pct + '%';
-                    if (progPct) progPct.textContent = pct + '%';
-                }
-            };
-            xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
-                else reject(new Error(JSON.parse(xhr.responseText)?.error || 'Upload thất bại'));
-            };
-            xhr.onerror = () => reject(new Error('Lỗi mạng'));
-            xhr.send(formData);
-        });
-        showToast(`Upload thành công! v${version}`, 'success');
-        if (prog) { progFill.style.width = '100%'; progPct.textContent = '100%'; }
-        // Reset
-        selectedFiles[type] = null;
-        const input = document.getElementById('file-' + type);
-        if (input) input.value = '';
-        const drop = document.getElementById('drop-' + type);
-        if (drop) {
-            drop.style.borderColor = ''; drop.style.background = '';
-            drop.querySelector('.dz-text').innerHTML = `Kéo thả file <strong>.${validMap[type][0]}</strong> vào đây`;
-            drop.querySelector('.dz-sub').textContent = 'hoặc bấm để chọn file';
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', ADMIN_API + '/upload');
+    xhr.setRequestHeader('Authorization', 'Bearer ' + adminToken);
+    xhr.upload.onprogress = function (e) {
+        if (e.lengthComputable) {
+            var pct = Math.round((e.loaded / e.total) * 100);
+            if (progFill) progFill.style.width = pct + '%';
+            if (progPct) progPct.textContent = pct + '%';
         }
-        setTimeout(() => { if (prog) prog.style.display = 'none'; }, 1500);
-        loadReleases(); loadDashboard();
-    } catch (e) {
-        showToast(e.message, 'error');
-    }
-    btn.disabled = false;
-    btn.textContent = { ipa: 'Upload IPA', apk: 'Upload APK', win: 'Upload EXE' }[type];
+    };
+    xhr.onload = function () {
+        if (xhr.status >= 200 && xhr.status < 300) {
+            showToast('Upload thanh cong! v' + version, 'success');
+            selectedFiles[type] = null;
+            var input = document.getElementById('file-' + type);
+            if (input) input.value = '';
+            var drop = document.getElementById('drop-' + type);
+            if (drop) {
+                drop.style.borderColor = '';
+                drop.querySelector('.dz-text').innerHTML = 'Keo tha file <strong>.' + VALID_EXTS[type][0] + '</strong> vao day';
+                drop.querySelector('.dz-sub').textContent = 'hoac bam de chon file';
+            }
+            setTimeout(function () { if (prog) prog.style.display = 'none'; }, 1500);
+            loadReleases(); loadDashboard();
+        } else {
+            try { showToast(JSON.parse(xhr.responseText).error || 'Upload that bai', 'error'); }
+            catch (e) { showToast('Upload that bai', 'error'); }
+        }
+        if (btn) { btn.disabled = false; btn.textContent = BTN_LABELS[type]; }
+    };
+    xhr.onerror = function () {
+        showToast('Loi mang', 'error');
+        if (btn) { btn.disabled = false; btn.textContent = BTN_LABELS[type]; }
+    };
+    xhr.send(formData);
 }
 
 // ============================================================
 // GUIDE URL SETTINGS
 // ============================================================
-async function loadGuideUrls() {
-    try {
-        const res = await fetch(`${ADMIN_API}/settings`, { headers: authHeaders() });
-        if (!res.ok) return;
-        const d = await res.json();
-        const ios = document.getElementById('input-ios-guide');
-        const and = document.getElementById('input-android-guide');
-        if (ios) ios.value = d.iosGuideUrl || '';
-        if (and) and.value = d.androidGuideUrl || '';
-    } catch { }
+function loadGuideUrls() {
+    fetch(ADMIN_API + '/settings', { headers: authHeaders() })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (d) {
+            if (!d) return;
+            var ios = document.getElementById('input-ios-guide');
+            var and = document.getElementById('input-android-guide');
+            if (ios) ios.value = d.iosGuideUrl || '';
+            if (and) and.value = d.androidGuideUrl || '';
+        })
+        .catch(function () { });
 }
 
-async function saveGuideUrls() {
-    const iosUrl = document.getElementById('input-ios-guide')?.value?.trim() || '';
-    const androidUrl = document.getElementById('input-android-guide')?.value?.trim() || '';
-    try {
-        const res = await fetch(`${ADMIN_API}/settings`, {
-            method: 'PUT',
-            headers: authHeaders({ 'Content-Type': 'application/json' }),
-            body: JSON.stringify({ iosGuideUrl: iosUrl, androidGuideUrl: androidUrl })
-        });
-        if (res.ok) showToast('Đã lưu cài đặt!', 'success');
-        else showToast('Lỗi khi lưu', 'error');
-    } catch { showToast('Không kết nối được server', 'error'); }
+function saveGuideUrls() {
+    var iosUrl = (document.getElementById('input-ios-guide') || {}).value || '';
+    var androidUrl = (document.getElementById('input-android-guide') || {}).value || '';
+    fetch(ADMIN_API + '/settings', {
+        method: 'PUT',
+        headers: authHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ iosGuideUrl: iosUrl.trim(), androidGuideUrl: androidUrl.trim() })
+    }).then(function (res) {
+        if (res.ok) showToast('Da luu cai dat!', 'success');
+        else showToast('Loi khi luu', 'error');
+    }).catch(function () { showToast('Khong ket noi duoc server', 'error'); });
 }
 
 // ============================================================
-// MISC UTILS
+// UTILS
 // ============================================================
-function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
 function fmtSize(bytes) {
-    if (!bytes) return '—';
-    const mb = bytes / 1024 / 1024;
+    if (!bytes) return 'N/A';
+    var mb = bytes / 1024 / 1024;
     return mb >= 1 ? mb.toFixed(1) + ' MB' : (bytes / 1024).toFixed(0) + ' KB';
 }
 function setStatus(id, release, label) {
-    const el = document.getElementById(id);
+    var el = document.getElementById(id);
     if (!el) return;
     el.textContent = label;
     el.style.color = release ? 'var(--accent-green)' : 'var(--text-muted)';
 }
 function refreshData() {
-    const active = document.querySelector('.panel.active')?.id?.replace('panel-', '');
-    if (active === 'dashboard') loadDashboard();
-    if (active === 'releases') loadReleases();
-    if (active === 'settings') loadGuideUrls();
-    showToast('Đã làm mới dữ liệu', 'info');
+    var active = document.querySelector('.panel.active');
+    var id = active ? active.id.replace('panel-', '') : 'dashboard';
+    if (id === 'dashboard') loadDashboard();
+    if (id === 'releases') loadReleases();
+    if (id === 'settings') loadGuideUrls();
+    showToast('Da lam moi du lieu', 'info');
 }
-
-// ---- Clock ----
 function updateClock() {
-    const el = document.getElementById('topbar-clock');
-    if (el) {
-        const now = new Date();
-        el.textContent = now.toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
-    }
+    var el = document.getElementById('topbar-clock');
+    if (el) el.textContent = new Date().toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' });
 }
 
 // ============================================================
 // INIT
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
     showPanel('dashboard', document.querySelector('.sidebar-item'));
     initDragDrop('ipa'); initDragDrop('apk'); initDragDrop('win');
     updateClock(); setInterval(updateClock, 30000);
